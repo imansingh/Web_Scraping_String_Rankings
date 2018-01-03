@@ -1,12 +1,21 @@
 shinyUI(dashboardPage(
-  dashboardHeader(title = "Stringforum Data"),
+  dashboardHeader(title = "Stringforum Project"),
   dashboardSidebar(
-    # sidebarUserPanel("Stringforum Project",
-    #                  image = "imansingh_headshot.jpg"),
+    sidebarUserPanel("Iman Singh",
+                     image = "imansingh_headshot.jpg"),
     sidebarMenu(
-      menuItem("String Selector", tabName = "strings", icon = icon("map")),
-      menuItem("Reviews by Racquet", tabName = "racquet", icon = icon("bar-chart")),
-      menuItem("Reviews by Tester", tabName = "tester", icon = icon("line-chart"))
+      menuItem("String Selector", tabName = "strings", 
+               icon = icon("map")),
+      menuItem("Reviews by Racquet", tabName = "racquet", 
+               icon = icon("bar-chart")),
+      menuItem("Reviews by Tester", tabName = "tester", 
+               icon = icon("line-chart")),
+      br(),
+      menuItem("Contact Iman"),
+      menuItem("LinkedIn", icon = icon("linkedin-square"), 
+               href = "https://www.linkedin.com/in/imansingh/"),
+      menuItem("GitHub", icon = icon("github"), 
+               href = "https://github.com/imansingh/Scraping-Project")
     )
   ),
   dashboardBody(
