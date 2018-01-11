@@ -105,3 +105,4 @@ racquet_means_clean = racquet_means %>% slice(30:1382)
 #dataframes with detailed review info
 detailed_reviews = string_data %>% select(string_name, price, tester_name, tester_racquet, tester_tension, tester_style, review_text, review_adjectives, comfort, control, durability, feel, power, spin, tension_stability, tester_satisfaction)
 
+genders = c('Male', 'Female')

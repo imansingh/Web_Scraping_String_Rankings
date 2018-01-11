@@ -16,7 +16,10 @@ library(DT)
 # Price: price_adjusted
 # Review Adjectives: review_adjectives_split
 
-
+table(string_data1$main_tension)
+table(racquet_manufacturer)
+string_data$racquet_manufacturer
+print('Midsize (600 cm\u00B2)')
 # read scraped data into dataframe
 string_data <- read.csv(file = "./stringforum.csv")
 

@@ -22,7 +22,6 @@ shinyServer(function(input, output){
                               'power', 'spin', 'tension_stab', 'satisfaction'), 
                   digits = 4)
   })
-d
   output$racquet_means_table <- DT::renderDataTable({
     #racquet_means_selected <- racquet_means_clean %>% filter(reviews >= input$racquet_minimum_reviews)
     racquet_selected_means <- racquet_means_clean %>% filter(tester_racquet == input$selected_racquet)
