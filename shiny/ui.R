@@ -96,20 +96,37 @@ shinyUI(dashboardPage(
                              ),
                            fluidRow(
                              column(width = 4,
-                                    h4('String Adjectives:'), 'Only include
-                                    strings with one or more reviews listing
-                                    these adjectives'),
+                                    h4('String Adjectives (Positive):'), 
+                                    'Only include strings where one or more 
+                                    reviewers listed these adjectives'),
                              column(width = 8,
                                     box(selectizeInput(
-                                      'string_adjectives', 
-                                      'Filter by Adjectives',
-                                      choices = unlist(
-                                        string_data1$review_adjectives),
+                                      'string_adjectives_positive', 
+                                      'Filter by Adjectives (Positive)',
+                                      choices = sort(unlist(
+                                        string_data1$review_adjectives)),
                                       multiple = TRUE,
                                       options = list(placeholder = 
                                                        '(choose one or more)')),
                                       width = NULL)
                                     )
+                             ),
+                           fluidRow(
+                             column(width = 4,
+                                    h4('String Adjectives (Negative):'), 
+                                    'Do not include any strings where a reviewer
+                                    listed these adjectives'),
+                             column(width = 8,
+                                    box(selectizeInput(
+                                      'string_adjectives_negative', 
+                                      'Filter by Adjectives (Negative)',
+                                      choices = sort(unlist(
+                                        string_data1$review_adjectives)),
+                                      multiple = TRUE,
+                                      options = list(placeholder = 
+                                                       '(choose one or more)')),
+                                      width = NULL)
+                             )
                              ),
                            fluidRow(
                              box(checkboxGroupInput(
@@ -197,9 +214,9 @@ shinyUI(dashboardPage(
                                     box(checkboxGroupInput(
                                       'tester_strokes', 
                                       'Tester Swing Speed',
-                                      choices = c('Fast', 'Medium', 'Slow',
+                                      choices = c('Slow', 'Medium', 'Fast',
                                                   'None Listed'),
-                                      selected = c('Fast', 'Medium', 'Slow',
+                                      selected = c('Slow', 'Medium', 'Fast',
                                                    'None Listed')),
                                       actionLink('selectall',"Select All"),
                                       HTML('&ensp;'), '|', HTML('&ensp;'),
@@ -227,9 +244,9 @@ shinyUI(dashboardPage(
                                     box(checkboxGroupInput(
                                       'tester_spin', 
                                       'Tester Spin Level',
-                                      choices = c('Heavy', 'Moderate', 'Low',
+                                      choices = c('Low', 'Moderate', 'Heavy',
                                                   'None Listed'),
-                                      selected = c('Heavy', 'Moderate', 'Low', 
+                                      selected = c('Low', 'Moderate', 'Heavy', 
                                                    'None Listed')),
                                       actionLink('selectall',"Select All"),
                                       HTML('&ensp;'), '|', HTML('&ensp;'),
@@ -253,7 +270,7 @@ shinyUI(dashboardPage(
                              box(selectizeInput(
                                'racquet_manufacturer', 
                                'Tester Racquet Manufacturer(s)', 
-                               choices = string_data$racquet_manufacturer,
+                               choices = sort(string_data$racquet_manufacturer),
                                multiple = TRUE,
                                options = list(placeholder = 
                                                 '(choose one or more)')),
@@ -264,7 +281,7 @@ shinyUI(dashboardPage(
                              box(selectizeInput(
                                'racquet_model',
                                'Tester Racquet Model(s)',
-                               choices = vec_models_by_manufacturer,
+                               choices = models_by_manufacturer,
                                # choices = string_data$racquet_model,
                                multiple = TRUE,
                                options = list(placeholder = 
@@ -277,7 +294,7 @@ shinyUI(dashboardPage(
                              box(selectizeInput(
                                'string_pattern',
                                'Tester String Pattern',
-                               choices = string_data1$string_pattern,
+                               choices = sort(string_data1$string_pattern),
                                multiple = TRUE,
                                options = list(placeholder = 
                                                 '(choose one or more)')),
@@ -290,19 +307,19 @@ shinyUI(dashboardPage(
                              box(checkboxGroupInput(
                                'frame_size', 
                                'Tester Frame Size',
-                               choices = c('Midsize (>93 in\u00B2, 
-                                           >593 cm\u00B2)',
-                                           'MidPlus (93-105 in\u00B2,
-                                           594-677 cm\u00B2)',
-                                           'Oversize (>106 in\u00B2,
-                                           >678 cm\u00B2)',
+                               choices = c('Midsize ( >93 in\u00B2, 
+                                           >593 cm\u00B2 )',
+                                           'MidPlus ( 93-105 in\u00B2,
+                                           594-677 cm\u00B2 )',
+                                           'Oversize ( >106 in\u00B2,
+                                           >678 cm\u00B2 )',
                                            'None Listed'),
-                               selected = c('Midsize (>93 in\u00B2, 
-                                            >593 cm\u00B2)',
-                                            'MidPlus (93-105 in\u00B2,
-                                            594-677 cm\u00B2)',
-                                            'Oversize (>106 in\u00B2,
-                                            >678 cm\u00B2)',
+                               selected = c('Midsize ( >93 in\u00B2, 
+                                           >593 cm\u00B2 )',
+                                            'MidPlus ( 93-105 in\u00B2,
+                                           594-677 cm\u00B2 )',
+                                            'Oversize ( >106 in\u00B2,
+                                           >678 cm\u00B2 )',
                                             'None Listed')),
                                actionLink('selectall',"Select All"),
                                HTML('&ensp;'), '|', HTML('&ensp;'),

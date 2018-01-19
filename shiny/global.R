@@ -21,72 +21,18 @@ simpleCap = function(string){
 # if df column is a vector
 get_checkbox_items_vec = function(string){
   raw_strings = unique(string_data1[[string]][!is.na(string_data1[[string]])])
-  processed_strings = unname(sapply(gsub('_', ' ', raw_strings), simpleCap))
-  return(c(processed_strings, none_text))
+  processed_strings = unname(sort(sapply(gsub('_', ' ', raw_strings), simpleCap)))
+  return(c(sort(processed_strings), none_text))
 }
 
 #if df column is a list
 get_checkbox_items_list = function(string){
   raw_strings = unique(unlist(string_data1[[string]]))
   processed_strings = unname(sapply(gsub('_', ' ', raw_strings), simpleCap))
-  return(c(processed_strings, none_text))
+  return(c(sort(processed_strings), none_text))
 }
 
-##Created nested list of racquet models by manufacturer
-models_by_manufacturer = list()
-for(manufacturer in unique(string_data$racquet_manufacturer)){
-  models_by_manufacturer[[manufacturer]] = 
-    string_data1$racquet_model[string_data1$racquet_manufacturer == manufacturer]
-}
-
-list(Eastern = c('NYC', 'PBJ'), Western = c('JOK', 'ADA'))
 models_by_manufacturer
-get_models_by_manufacturer = function(string){
-  list = c()
-  manufacturers = unique(string_data1[[string]])
-  for(i in manufacturers[manufacturers != '']){
-    assign(i, string_data1$racquet_model[string_data1$racquet_manufacturer == i])
-    list = c(list, i)
-  }
-  return(list)
-}
-get_models_by_manufacturer = function(string){
-  list = c()
-  manufacturers = unique(string_data1[[string]])
-  for(i in manufacturers[manufacturers != '']){
-    assign(i, string_data1$racquet_model[string_data1$racquet_manufacturer == i])
-    list = c(list, i)
-  }
-  return(list)
-}
-
-names(models_by_manufacturer)[[1]]
-#string_data1$racquet_model[string_data1$racquet_manufacturer == 'Prince']
-models2 = get_models_by_manufacturer('racquet_manufacturer')
-models2[2]
-#Prince
-man = unique(string_data1[["racquet_manufacturer"]])
-man[man != '']
-
-na.omit(unique(string_data1$tester_gender))
-for(manufacturer in unique(string_data$racquet_manufacturer)){
-  models_by_manufacturer[[manufacturer]] = 
-    string_data1$racquet_model[string_data1$racquet_manufacturer == manufacturer]
-}
-#assign(names(models_by_manufacturer)[1], models_by_manufacturer[names(models_by_manufacturer)[1]])
-
-typeof(models_by_manufacturer)[[1]]
-typeof(models_by_manufacturer[1])
-names(models_by_manufacturer)
-models_by_manufacturer[4]
-model1[1]
-names(model1)[1] = model1[names(model1)[1]]
-rm(`names(model1)[1]`)
-names(model1)
-Babolat
-string_data1$racquet_model['Head']
-unique(string_data1$racquet_manufacturer)
-
 ##Create vectors for racquet_manufacturers and racquet_models
 #Get racquet_names and racquet_specs from tester_racquet column
 #specs are inside last set of parentheses, so split on last opening parenthesis

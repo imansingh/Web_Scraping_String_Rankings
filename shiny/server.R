@@ -1,8 +1,12 @@
 shinyServer(function(input, output){
   #options(DT.extensions = list('ColReorder'), DT.options = list(scrollX=TRUE, scrollY=TRUE, colReorder = TRUE))
   # show strings data.table
-  output$criteria_table <- DT::renderDataTable({
-    string_criteria_filtered <- string_data1 %>% 
+  
+  ## Produce filtered data table based on user criteria
+  output$criteria_table = DT::renderDataTable({
+    
+    # Filter based on string criteria 
+    string_criteria_filtered = string_data1 %>% 
       filter(num_ratings >= input$string_minimum_reviews) %>%
       filter(adjusted_price >= input$string_price[1]) %>%
       filter(adjusted_price <= input$string_price[2]) %>%
@@ -10,8 +14,47 @@ shinyServer(function(input, output){
       filter(string_gauge_metric <= input$string_gauge_metric[2]) %>%
       filter(string_gauge_us >= input$string_gauge_us[1]) %>%
       filter(string_gauge_us <= input$string_gauge_us[2])
+    
+    if(input$string_adjectives_positive != ''){
+      matrix = sapply(input$string_adjectives_positive, 
+                      function(string) 
+                        grepl(string, 
+                              string_criteria_filtered$review_adjectives))
+      string_criteria_filtered = string_criteria_filtered[rowSums(matrix) > 0,]
+    }
+    
+    if(input$string_adjectives_negative != ''){
+      matrix = sapply(input$string_adjectives_negative, 
+                      function(string) 
+                        grepl(string, 
+                              string_criteria_filtered$review_adjectives))
+      string_criteria_filtered = string_criteria_filtered[rowSums(matrix) < 1,]
+    }
+    
+    if(!is.null(input$string_material)){
+      matrix = sapply(input$string_material, 
+                      function(string) 
+                        grepl(string, 
+                              string_criteria_filtered$string_material))
+      string_criteria_filtered = string_criteria_filtered[rowSums(matrix) > 0,]
+    }
+    
+    if(!is.null(input$string_construction)){
+      matrix = sapply(input$string_construction, 
+                      function(string) 
+                        grepl(string, 
+                              string_criteria_filtered$string_construction))
+      string_criteria_filtered = string_criteria_filtered[rowSums(matrix) > 0,]
+    }
+    
+    if(!is.null(input$string_features)){
+      matrix = sapply(input$string_features, 
+                      function(string) 
+                        grepl(string, 
+                              string_criteria_filtered$string_features))
+      string_criteria_filtered = string_criteria_filtered[rowSums(matrix) > 0,]
+    }
 
-      
     string_means_weighted <- string_means_selected %>% 
       arrange(desc(comfort * input$string_comfort + 
                      control * input$string_control + 

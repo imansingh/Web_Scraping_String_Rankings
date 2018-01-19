@@ -16,6 +16,90 @@ library(DT)
 # Price: price_adjusted
 # Review Adjectives: review_adjectives_split
 
+string_criteria_filtered <- string_data1 %>% 
+  filter(num_ratings >= input$string_minimum_reviews) %>%
+  filter(adjusted_price >= input$string_price[1]) %>%
+  filter(adjusted_price <= input$string_price[2]) %>%
+  filter(string_gauge_metric >= input$string_gauge_metric[1]) %>%
+  filter(string_gauge_metric <= input$string_gauge_metric[2]) %>%
+  filter(string_gauge_us >= input$string_gauge_us[1]) %>%
+  filter(string_gauge_us <= input$string_gauge_us[2])
+
+test_filtered = filter(string_data1, grepl(vec, review_adjectives))
+test_filtered
+
+vec = c('soft', 'comfortable')
+vec = NULL
+if(!is.null(vec)){
+  matrix = sapply(vec, function(string) grepl(string, string_data1$review_adjectives))
+  test_filtered1 = string_data1[rowSums(matrix) > 0,]
+}
+
+rowSums(matrix)
+string_data1$review_adjectives[vec %in% string_data1$review_adjectives]
+
+test_filtered
+
+##Created nested list of racquet models by manufacturer
+models_by_manufacturer = list()
+for(manufacturer in unique(string_data1$racquet_manufacturer[
+  string_data1$racquet_manufacturer != ''])){
+  models_by_manufacturer[[manufacturer]] = 
+    sort(unique(string_data1$racquet_model[
+      string_data1$racquet_manufacturer == manufacturer]))
+}
+models_by_manufacturer
+names(models_by_manufacturer)
+sort(unique(string_data1$racquet_manufacturer))
+list(Eastern = c('NYC', 'PBJ'), Western = c('JOK', 'ADA'))
+models_by_manufacturer
+get_models_by_manufacturer = function(string){
+  list = c()
+  manufacturers = unique(string_data1[[string]])
+  for(i in manufacturers[manufacturers != '']){
+    assign(i, string_data1$racquet_model[string_data1$racquet_manufacturer == i])
+    list = c(list, i)
+  }
+  return(list)
+}
+
+get_models_by_manufacturer = function(string){
+  list = c()
+  manufacturers = unique(string_data1[[string]])
+  for(i in manufacturers[manufacturers != '']){
+    assign(i, string_data1$racquet_model[string_data1$racquet_manufacturer == i])
+    list = c(list, i)
+  }
+  return(list)
+}
+
+names(models_by_manufacturer)[[1]]
+#string_data1$racquet_model[string_data1$racquet_manufacturer == 'Prince']
+models2 = get_models_by_manufacturer('racquet_manufacturer')
+models2[2]
+#Prince
+man = unique(string_data1[["racquet_manufacturer"]])
+man[man != '']
+
+na.omit(unique(string_data1$tester_gender))
+for(manufacturer in unique(string_data$racquet_manufacturer)){
+  models_by_manufacturer[[manufacturer]] = 
+    string_data1$racquet_model[string_data1$racquet_manufacturer == manufacturer]
+}
+#assign(names(models_by_manufacturer)[1], models_by_manufacturer[names(models_by_manufacturer)[1]])
+
+typeof(models_by_manufacturer)[[1]]
+typeof(models_by_manufacturer[1])
+names(models_by_manufacturer)
+models_by_manufacturer[4]
+model1[1]
+names(model1)[1] = model1[names(model1)[1]]
+rm(`names(model1)[1]`)
+names(model1)
+Babolat
+string_data1$racquet_model['Head']
+unique(string_data1$racquet_manufacturer)
+
 manufacturer_grouped = string_data1 %>% group_by(racquet_manufacturer)
 manufacturer_grouped
 model1 = models_by_manufacturer
