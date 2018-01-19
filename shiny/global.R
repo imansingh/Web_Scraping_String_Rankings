@@ -8,8 +8,86 @@ library(shinydashboard)
 
 string_data <- read.csv(file = "./stringforum.csv")
 
-##Create vectors for racquet_manufacturers and racquet_models
+## Functions to generate checkboxinput items from dataframe columns
 
+# text to show next to the 'none' checkbox
+none_text = 'None Listed' 
+
+simpleCap = function(string){
+  split_string = strsplit(string, ' ')[[1]]
+  paste(toupper(substring(split_string, 1, 1)), substring(split_string, 2),
+        sep = '', collapse = ' ')
+}
+# if df column is a vector
+get_checkbox_items_vec = function(string){
+  raw_strings = unique(string_data1[[string]][!is.na(string_data1[[string]])])
+  processed_strings = unname(sapply(gsub('_', ' ', raw_strings), simpleCap))
+  return(c(processed_strings, none_text))
+}
+
+#if df column is a list
+get_checkbox_items_list = function(string){
+  raw_strings = unique(unlist(string_data1[[string]]))
+  processed_strings = unname(sapply(gsub('_', ' ', raw_strings), simpleCap))
+  return(c(processed_strings, none_text))
+}
+
+##Created nested list of racquet models by manufacturer
+models_by_manufacturer = list()
+for(manufacturer in unique(string_data$racquet_manufacturer)){
+  models_by_manufacturer[[manufacturer]] = 
+    string_data1$racquet_model[string_data1$racquet_manufacturer == manufacturer]
+}
+
+list(Eastern = c('NYC', 'PBJ'), Western = c('JOK', 'ADA'))
+models_by_manufacturer
+get_models_by_manufacturer = function(string){
+  list = c()
+  manufacturers = unique(string_data1[[string]])
+  for(i in manufacturers[manufacturers != '']){
+    assign(i, string_data1$racquet_model[string_data1$racquet_manufacturer == i])
+    list = c(list, i)
+  }
+  return(list)
+}
+get_models_by_manufacturer = function(string){
+  list = c()
+  manufacturers = unique(string_data1[[string]])
+  for(i in manufacturers[manufacturers != '']){
+    assign(i, string_data1$racquet_model[string_data1$racquet_manufacturer == i])
+    list = c(list, i)
+  }
+  return(list)
+}
+
+names(models_by_manufacturer)[[1]]
+#string_data1$racquet_model[string_data1$racquet_manufacturer == 'Prince']
+models2 = get_models_by_manufacturer('racquet_manufacturer')
+models2[2]
+#Prince
+man = unique(string_data1[["racquet_manufacturer"]])
+man[man != '']
+
+na.omit(unique(string_data1$tester_gender))
+for(manufacturer in unique(string_data$racquet_manufacturer)){
+  models_by_manufacturer[[manufacturer]] = 
+    string_data1$racquet_model[string_data1$racquet_manufacturer == manufacturer]
+}
+#assign(names(models_by_manufacturer)[1], models_by_manufacturer[names(models_by_manufacturer)[1]])
+
+typeof(models_by_manufacturer)[[1]]
+typeof(models_by_manufacturer[1])
+names(models_by_manufacturer)
+models_by_manufacturer[4]
+model1[1]
+names(model1)[1] = model1[names(model1)[1]]
+rm(`names(model1)[1]`)
+names(model1)
+Babolat
+string_data1$racquet_model['Head']
+unique(string_data1$racquet_manufacturer)
+
+##Create vectors for racquet_manufacturers and racquet_models
 #Get racquet_names and racquet_specs from tester_racquet column
 #specs are inside last set of parentheses, so split on last opening parenthesis
 racquet_names_full = as.character(string_data$tester_racquet)
@@ -81,6 +159,7 @@ get_prices = function(vector){
 }
 price_adjusted = sapply(price_split, get_prices)
 
+unique(string_data$racquet_model[string_data$racquet_manufacturer == 'Head'])
 
 #Add racquet_manufacturer, racquet_model, and adjusted_price columns to string_data dataframe 
 string_data = mutate(string_data, 

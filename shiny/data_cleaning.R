@@ -12,13 +12,46 @@ library(DT)
                      # string_pattern
 # Tester Racquet Tension: main_tension, cross_tension
 # String Info: string_material, string_construction, string_features
-# String Gauge: string_gauge
+# String Gauge: string_gauge_metric, string_gauge_us
 # Price: price_adjusted
 # Review Adjectives: review_adjectives_split
 
+manufacturer_grouped = string_data1 %>% group_by(racquet_manufacturer)
+manufacturer_grouped
+model1 = models_by_manufacturer
+
+vec_models_by_manufacturer = unlist(models_by_manufacturer, recursive = TRUE, use.names = TRUE)
+vec_models_by_manufacturer
+c(unique(unlist(string_data1$string_material)), 'None Selected')
+
+unlist(string_data1$review_adjectives)
+
+col_name = paste0('string_data1$', 'string_material')
+col_name
+c(unique(unlist(as.name(col_name))), 'None Listed')
+string_data1[['string_gauge_metric']]
+col_name1 = 'string_material'
+attach(string_data1)
+detach()
+as.name(col_name1)
+string_material
+unlist(as.name(col_name))
+col_name
+as.name(col_name)
+parse(text = 'do')
+
+unique(unlist(string_material))
+unique(string_gauge_metric)
+table(string_gauge)
 table(string_data1$main_tension)
 table(racquet_manufacturer)
 string_data$racquet_manufacturer
+min(string_data$num_ratings)
+max(string_data$num_ratings)
+min(string_data1$price_adjusted, na.rm = TRUE)
+max(string_data1$price_adjusted)
+
+
 print('Midsize (600 cm\u00B2)')
 # read scraped data into dataframe
 string_data <- read.csv(file = "./stringforum.csv")
@@ -281,9 +314,221 @@ string_features = sapply(string_info_split, get_string_features)
 # Extract string_gauge from string_name
 string_names_full = as.character(string_data$string_name)
 string_names_split = strsplit(string_names_full, ' ')
-
 string_gauge = sapply(string_names_split, function(l) l[length(l)])
 
+# convet US and metric measurements and create string_gauge_metric and 
+# string_gauge_us
+
+# label hybrids
+label_hybrids = function(vector){
+  if(vector[1] == 'N'){
+    vector = ''
+  } else if('~' %in% vector){
+    vector = 'oblong'
+  } else if('/' %in% vector) {
+    vector = 'hybrid'
+  } else{
+    vector = vector
+  }
+  return(vector)
+}
+string_gauge_split = strsplit(string_gauge, '')
+string_gauge_labeled = sapply(string_gauge_split, label_hybrids)
+string_gauge_labeled
+get_metric_gauge = function(vector){
+  if('.' %in% vector){
+    vector = as.numeric(paste(vector, collapse = ''))
+  } else {
+    vector = paste(vector, collapse = '')
+    if(vector == '15'){
+      vector = mean(c(1.41, 1.49))
+    } else if(vector == '15L'){
+      vector = mean(c(1.33, 1.41))
+    } else if(vector == '16'){
+      vector = mean(c(1.26, 1.34))
+    } else if(vector == '16L'){
+      vector = mean(c(1.22, 1.30))
+    } else if(vector == '17' | vector == '17L'){
+      vector = mean(c(1.16, 1.24))
+    } else if(vector == '18' | vector == '18L'){
+      vector = mean(c(1.06, 1.16))
+    } else if(vector == '19' | vector == '19L'){
+      vector = mean(c(0.9, 1.06))
+    }
+  }
+  return(vector)
+}
+paste(string_gauge_labeled[[991]], collapse = '')
+mean(c(1.41, 1.49))
+1.48 %in% seq(1.41, 1.49)
+seq(1.41, 1.49, .01)
+seq(1,3)
+string_gauge_metric = as.numeric(sapply(string_gauge_labeled, get_metric_gauge))
+string_gauge_metric
+table(string_gauge_metric)
+
+get_us_gauge = function(vector){
+  # if('.' %in% vector){
+  #   metric = as.numeric(paste(vector, collapse = ''))
+  #   if(metric %in% seq(1.34, 1.49, .01)){
+  #     vector = 15
+  #   } else if(metric %in% seq(1.23, 1.33, .01)){
+  #     vector = 16
+  #   } else if(metric %in% seq(1.16, 1.22, .01)){
+  #     vector = 17
+  #   } else if(metric %in% seq(1.06, 1.15, .01)){
+  #     vector = 18
+  #   } else if(metric %in% seq(.9, 1.05, .01)){
+  #     vector = 19
+  #   }
+  if('.' %in% vector){
+    metric = as.numeric(paste(vector, collapse = ''))
+    if(metric >= 1.34 & metric <= 1.49){
+      vector = 15
+    } else if(metric >= 1.23 & metric <= 1.33){
+      vector = 16
+    } else if(metric >= 1.16 & metric <= 1.22){
+      vector = 17
+    } else if(metric >= 1.06 & metric <= 1.15){
+      vector = 18
+    } else if(metric >= .9 & metric <= 1.05){
+      vector = 19
+    }
+  } else {
+    vector = paste(vector, collapse = '')
+    if(vector == '15' | vector == '15L'){
+      vector = 15
+    } else if(vector == '16' | vector == '16L'){
+      vector = 16
+    } else if(vector == '17' | vector == '17L'){
+      vector = 17
+    } else if(vector == '18' | vector == '18L'){
+      vector = 18
+    } else if(vector == '19' | vector == '19L'){
+      vector = 19
+    }
+  }
+  return(vector)
+}
+collapse = function(vector){
+  gauge_string = paste(vector, collapse = '')
+  return(gauge_string)
+}
+string_gauge_collapsed = sapply(string_gauge_labeled, collapse)
+string_gauge_collapsed
+summary(string_gauge_collapsed)
+
+remove_l = function(string){
+  if(string == '15' | string == '15L'){
+    string = 15
+  } else if(string == '16' | string == '16L'){
+    string = 16
+  } else if(string == '17' | string == '17L'){
+    string = 17
+  } else if(string == '18' | string == '18L'){
+    string = 18
+  }
+  else if(string == '19' | string == '19L'){
+    string = 16
+  }
+  return(string)
+}
+
+string_gauge_no_l = sapply(string_gauge_collapsed, remove_l)
+string_gauge_no_l
+summary(string_gauge_no_l)
+
+get_us_gauge = function(string){
+  gauge_num = as.numeric(string)
+  if(!(is.na(gauge_num))){
+    if(gauge_num >= 1.34 & gauge_num <= 1.49){
+      gauge_num = 15
+    } else if(gauge_num >= 1.23 & gauge_num < 1.34){
+      gauge_num = 16
+    } else if(gauge_num >= 1.16 & gauge_num < 1.23){
+      gauge_num = 17
+    } else if(gauge_num >= 1.06 & gauge_num < 1.16){
+      gauge_num = 18
+    } else if(gauge_num >= .9 & gauge_num < 1.06){
+      gauge_num = 19
+    }
+  }
+  return(gauge_num)
+}
+
+string_gauge_us = sapply(string_gauge_no_l, get_us_gauge)
+string_gauge_us
+as.numeric(string_gauge_no_l[7]) >= 1.16
+table(string_gauge_us)
+table(metric_gauge)
+typeof(us_gauge)
+summary(us_gauge)
+
+  else if(gauge_string == '16' | gauge_string == '16L'){
+    vector = 16
+  } else if(gauge_string == '17' | gauge_string == '17L'){
+    vector = 17
+  } else if(gauge_string == '18' | gauge_string == '18L'){
+    vector = 18
+  } else if(gauge_string == '19' | gauge_string == '19L'){
+    vector = 19
+  }
+  return(vector)
+}
+
+
+collapse = function(vector){
+  gauge_string = paste(vector, collapse = '')
+}
+string_gauge_collapsed = sapply(string_gauge_labeled, collapse)
+string_gauge_collapsed
+string_gauge_collapsed_no_l = sapply(string_gauge_labeled, remove_l)
+string_gauge_collapsed_no_l
+paste(string_gauge_labeled[[1]], collapse = '')
+
+string_gauge_collapsed = sapply(string_gauge_labeled, function(l) paste(l, collapse = ''))
+string_gauge_collapsed
+table(string_gauge_collapsed)
+
+as.numeric('')
+
+typeof(string_gauge_labeled[[1]]) == 'character'
+string_gauge
+forced_numerics = sapply(string_gauge_labeled, function(l) as.numeric(paste(l, collapse = '')))
+table(forced_numerics)
+%in% range(1.3, 1.4)
+1.38 %in% range(1.3, 1.4)
+us_gauge = as.numeric(sapply(string_gauge_labeled, get_us_gauge))
+string_gauge_labeled
+us_gauge
+
+us_gauge1 = as.numeric(sapply(string_gauge_labeled, get_us_gauge1))
+us_gauge1
+
+which(string_gauge %in% '1.28')
+which(string_gauge %in% '1.27')
+which(string_gauge %in% '1.13')
+
+as.numeric(string_gauge)
+string_gauge_labeled[15120]
+string_gauge_labeled
+table(string_gauge)
+table(string_gauge_labeled)
+which(string_gauge %in% 'N/A')
+string_gauge[15715]
+string_data[15120,]
+string_gauge_split
+'/' %in% string_gauge_split[[967]]
+'1' %in% string_gauge_split[[967]]
+string_gauge_split[967]
+
+
+
+string_gauge
+string_gauge_hybrid
+
+if(string_gag)
+string_gauge
 
 ## Price
 # Convert  prices to dollars, find average price, and create column for adjusted price
@@ -344,7 +589,8 @@ string_data1 = mutate(string_data,
                       'string_material' = string_material,
                       'string_construction' = string_construction,
                       'string_features' = string_features,
-                      'string_gauge' = string_gauge,
+                      'string_gauge_metric' = string_gauge_metric,
+                      'string_gauge_us' = string_gauge_us,
                       'price_adjusted' = price_adjusted,
                       'review_adjectives' = review_adjectives_split)
 
