@@ -16,17 +16,31 @@ library(DT)
 # Price: price_adjusted
 # Review Adjectives: review_adjectives_split
 
-string_criteria_filtered <- string_data1 %>% 
-  filter(num_ratings >= input$string_minimum_reviews) %>%
-  filter(adjusted_price >= input$string_price[1]) %>%
-  filter(adjusted_price <= input$string_price[2]) %>%
-  filter(string_gauge_metric >= input$string_gauge_metric[1]) %>%
-  filter(string_gauge_metric <= input$string_gauge_metric[2]) %>%
-  filter(string_gauge_us >= input$string_gauge_us[1]) %>%
-  filter(string_gauge_us <= input$string_gauge_us[2])
-
+string_criteria_filtered1 <- string_data1 %>% 
+  filter(num_ratings >= 25) %>%
+  filter(adjusted_price >= 5) %>%
+  filter(adjusted_price <= 25) %>%
+  filter(string_gauge_metric >= .01) %>%
+  filter(string_gauge_metric <= 500) %>%
+  filter(string_gauge_us >= 16) %>%
+  filter(string_gauge_us <= 19)
+string_criteria_filtered1
 test_filtered = filter(string_data1, grepl(vec, review_adjectives))
 test_filtered
+
+vec = c('Aramid', 'Polyester', 'Polyamid', 'Natural Gut', 'Polyethylene', 'Polyurethane', 'Zyex')
+vec1 = c('Aramid', 'Polyester', 'Polyamid', 'None Listed')
+
+
+matrix = sapply(vec,
+                function(string)
+                  grepl(string,
+                        string_data1$string_material))
+
+matrix
+
+string_material_filtered = string_data1[rowSums(matrix) > 0,]
+string_material_filtered
 
 vec = c('soft', 'comfortable')
 vec = NULL
@@ -38,9 +52,25 @@ if(!is.null(vec)){
 rowSums(matrix)
 string_data1$review_adjectives[vec %in% string_data1$review_adjectives]
 
+test1 = string_data1$string_material[[!(identical(string_data1$string_material, character(0)))]]
+test1 = sapply(string_data1$string_material, function(vec) !identical(vec, character(0)))
+sum(test1)
+identical(test1[[3]], character(0))
+identical(string_data1$string_material[[3]], character(0))
 test_filtered
 
-##Created nested list of racquet models by manufacturer
+models_by_manufacturer
+## Replace string vectors with single strings
+string_data1$review_adjectives
+review_adjectives_combined = review_adjectives_full
+
+string_material_combined = sapply(string_material, function(vec) paste(vec, collapse = ', '))
+string_construction_combined = sapply(string_construction, function(vec) paste(vec, collapse = ', '))
+string_features_combined = sapply(string_features, function(vec) paste(vec, collapse = ', '))
+
+
+
+## Created nested list of racquet models by manufacturer
 models_by_manufacturer = list()
 for(manufacturer in unique(string_data1$racquet_manufacturer[
   string_data1$racquet_manufacturer != ''])){

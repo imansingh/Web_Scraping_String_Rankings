@@ -13,27 +13,31 @@ string_data <- read.csv(file = "./stringforum.csv")
 # text to show next to the 'none' checkbox
 none_text = 'None Listed' 
 
+# capitalize first letter of each word in a string
 simpleCap = function(string){
   split_string = strsplit(string, ' ')[[1]]
   paste(toupper(substring(split_string, 1, 1)), substring(split_string, 2),
         sep = '', collapse = ' ')
 }
-# if df column is a vector
+
+# get checkbox itesm names if df column is a vector
 get_checkbox_items_vec = function(string){
-  raw_strings = unique(string_data1[[string]][!is.na(string_data1[[string]])])
+  raw_strings = unique(string_data1[[string]][!identical(string_data1[[string]],
+                                                         character(0))])
   processed_strings = unname(sort(sapply(gsub('_', ' ', raw_strings), simpleCap)))
   return(c(sort(processed_strings), none_text))
 }
 
-#if df column is a list
+# get checkboax item names if df column is a list
 get_checkbox_items_list = function(string){
-  raw_strings = unique(unlist(string_data1[[string]]))
+  raw_strings = unique(unlist(string_data1[[string]][!identical(string_data1[[string]], 
+                                                                character(0))]))
   processed_strings = unname(sapply(gsub('_', ' ', raw_strings), simpleCap))
   return(c(sort(processed_strings), none_text))
 }
 
-models_by_manufacturer
 ##Create vectors for racquet_manufacturers and racquet_models
+
 #Get racquet_names and racquet_specs from tester_racquet column
 #specs are inside last set of parentheses, so split on last opening parenthesis
 racquet_names_full = as.character(string_data$tester_racquet)

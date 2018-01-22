@@ -38,15 +38,15 @@ shinyUI(dashboardPage(
                   #height = '500px',
                   width = 12,
                   selected = 'String Criteria',
-                  tabPanel("String Criteria",
+                  tabPanel('String Criteria',
                            h3('Only include reviews for strings with these 
                               characteristics:'),
                            fluidRow(
                              box(sliderInput('string_minimum_reviews', 
                                              'Minimum # of Reviews', 
-                                             min = min(string_data$num_ratings, 
+                                             min = min(string_data1$num_ratings, 
                                                        na.rm = TRUE), 
-                                             max = max(string_data$num_ratings, 
+                                             max = max(string_data1$num_ratings, 
                                                        na.rm = TRUE), 
                                              value = 1), 
                                  width = 6),
@@ -94,40 +94,40 @@ shinyUI(dashboardPage(
                                       width = NULL)
                                     )
                              ),
-                           fluidRow(
-                             column(width = 4,
-                                    h4('String Adjectives (Positive):'), 
-                                    'Only include strings where one or more 
-                                    reviewers listed these adjectives'),
-                             column(width = 8,
-                                    box(selectizeInput(
-                                      'string_adjectives_positive', 
-                                      'Filter by Adjectives (Positive)',
-                                      choices = sort(unlist(
-                                        string_data1$review_adjectives)),
-                                      multiple = TRUE,
-                                      options = list(placeholder = 
-                                                       '(choose one or more)')),
-                                      width = NULL)
-                                    )
-                             ),
-                           fluidRow(
-                             column(width = 4,
-                                    h4('String Adjectives (Negative):'), 
-                                    'Do not include any strings where a reviewer
-                                    listed these adjectives'),
-                             column(width = 8,
-                                    box(selectizeInput(
-                                      'string_adjectives_negative', 
-                                      'Filter by Adjectives (Negative)',
-                                      choices = sort(unlist(
-                                        string_data1$review_adjectives)),
-                                      multiple = TRUE,
-                                      options = list(placeholder = 
-                                                       '(choose one or more)')),
-                                      width = NULL)
-                             )
-                             ),
+                           # fluidRow(
+                           #   column(width = 4,
+                           #          h4('String Adjectives (Positive):'), 
+                           #          'Only include strings where one or more 
+                           #          reviewers listed these adjectives'),
+                           #   column(width = 8,
+                           #          box(selectizeInput(
+                           #            'string_adjectives_positive', 
+                           #            'Filter by Adjectives (Positive)',
+                           #            choices = sort(unlist(
+                           #              string_data1$review_adjectives)),
+                           #            multiple = TRUE,
+                           #            options = list(placeholder = 
+                           #                             '(choose one or more)')),
+                           #            width = NULL)
+                           #          )
+                           #   ),
+                           # fluidRow(
+                           #   column(width = 4,
+                           #          h4('String Adjectives (Negative):'), 
+                           #          'Do not include any strings where a reviewer
+                           #          listed these adjectives'),
+                           #   column(width = 8,
+                           #          box(selectizeInput(
+                           #            'string_adjectives_negative', 
+                           #            'Filter by Adjectives (Negative)',
+                           #            choices = sort(unlist(
+                           #              string_data1$review_adjectives)),
+                           #            multiple = TRUE,
+                           #            options = list(placeholder = 
+                           #                             '(choose one or more)')),
+                           #            width = NULL)
+                           #          )
+                           #   ),
                            fluidRow(
                              box(checkboxGroupInput(
                                'string_material', 'String Material',
@@ -171,10 +171,12 @@ shinyUI(dashboardPage(
                                     box(checkboxGroupInput(
                                       'tester_gender', 
                                       'Tester Gender',
-                                      choices = get_checkbox_items_vec(
-                                        'tester_gender'),
-                                      selected = get_checkbox_items_vec(
-                                        'tester_gender')),
+                                      choices = c('Male', 
+                                                  'Female', 
+                                                  'None Listed'),
+                                      selected = c('Male',
+                                                   'Female',
+                                                   'None Listed')),
                                       actionLink('selectall',"Select All"),
                                       HTML('&ensp;'), '|', HTML('&ensp;'),
                                       actionLink('clearall', "Clear All"),
@@ -270,7 +272,8 @@ shinyUI(dashboardPage(
                              box(selectizeInput(
                                'racquet_manufacturer', 
                                'Tester Racquet Manufacturer(s)', 
-                               choices = sort(string_data$racquet_manufacturer),
+                               choices = sort(string_data1$racquet_manufacturer
+                                              [string_data1$racquet_manufacturer != '']),
                                multiple = TRUE,
                                options = list(placeholder = 
                                                 '(choose one or more)')),
@@ -359,7 +362,7 @@ shinyUI(dashboardPage(
               #     ),
                 fluidRow(h3("Top Strings Matching Your Selections")),
                 fluidRow(
-                       box(DT::dataTableOutput("string_table"), width = 12)
+                       box(DT::dataTableOutput("criteria_table"), width = 12)
                   )
               ),
       tabItem(tabName = "selector", 
