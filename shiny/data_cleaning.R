@@ -177,8 +177,8 @@ is_female = function(vector){
 
 # create vector that labels males and females
 tester_gender = c()
-tester_gender[sapply(tester_info_split, is_male)] = 'male'
-tester_gender[sapply(tester_info_split, is_female)] = 'female'
+tester_gender[sapply(tester_info_split, is_male)] = 'Male'
+tester_gender[sapply(tester_info_split, is_female)] = 'Female'
 
 
 # tester_age
@@ -199,10 +199,10 @@ is_senior = function(vector){
 
 # create vector that labels juniors, adults, young seniors and seniors
 tester_age = c()
-tester_age[sapply(tester_info_split, is_junior)] = 'junior'
-tester_age[sapply(tester_info_split, is_adult)] = 'adult'
-tester_age[sapply(tester_info_split, is_young_senior)] = 'young_senior'
-tester_age[sapply(tester_info_split, is_senior)] = 'senior'
+tester_age[sapply(tester_info_split, is_junior)] = 'Junior'
+tester_age[sapply(tester_info_split, is_adult)] = 'Adult'
+tester_age[sapply(tester_info_split, is_young_senior)] = 'Young Senior'
+tester_age[sapply(tester_info_split, is_senior)] = 'Senior'
 
 
 # tester_level
@@ -230,14 +230,14 @@ is_international_tournament = function(vector){
 # create vector that labels beginner, recreational, lower league,
 # upper league, national tournament, international tournament level
 tester_level = c()
-tester_level[sapply(tester_info_split, is_beginner)] = 'beginner'
-tester_level[sapply(tester_info_split, is_recreational)] = 'recreational'
-tester_level[sapply(tester_info_split, is_lower_league)] = 'lower_league'
-tester_level[sapply(tester_info_split, is_upper_league)] = 'upper_league'
+tester_level[sapply(tester_info_split, is_beginner)] = 'Beginner'
+tester_level[sapply(tester_info_split, is_recreational)] = 'Recreational'
+tester_level[sapply(tester_info_split, is_lower_league)] = 'Lower League'
+tester_level[sapply(tester_info_split, is_upper_league)] = 'Upper League'
 tester_level[sapply(tester_info_split, is_national_tournament)] = 
-  'national_tournament'
+  'National Tournament'
 tester_level[sapply(tester_info_split, is_international_tournament)] = 
-  'international_tournament'
+  'International Tournament'
 
 # tester_strokes
 # create functions to identify hard vs medium vs soft strokes
@@ -253,9 +253,9 @@ is_soft_strokes = function(vector){
 
 # create vector that labels hard, medium, and soft strokes
 tester_strokes = c()
-tester_strokes[sapply(tester_info_split, is_hard_strokes)] = 'hard'
-tester_strokes[sapply(tester_info_split, is_medium_strokes)] = 'medium'
-tester_strokes[sapply(tester_info_split, is_soft_strokes)] = 'soft'
+tester_strokes[sapply(tester_info_split, is_hard_strokes)] = 'Hard'
+tester_strokes[sapply(tester_info_split, is_medium_strokes)] = 'Medium'
+tester_strokes[sapply(tester_info_split, is_soft_strokes)] = 'Soft'
 
 
 # tester_spin
@@ -272,9 +272,9 @@ is_little_spin = function(vector){
 
 # create vector that labels heavy, moderate, and little spin
 tester_spin = c()
-tester_spin[sapply(tester_info_split, is_heavy_spin)] = 'heavy'
-tester_spin[sapply(tester_info_split, is_moderate_spin)] = 'moderate'
-tester_spin[sapply(tester_info_split, is_little_spin)] = 'little'
+tester_spin[sapply(tester_info_split, is_heavy_spin)] = 'Heavy'
+tester_spin[sapply(tester_info_split, is_moderate_spin)] = 'Moderate'
+tester_spin[sapply(tester_info_split, is_little_spin)] = 'Little'
 
 
 # tester_style
@@ -296,10 +296,12 @@ is_serve_volley = function(vector){
 # create vector that labels allround, baseline defensive, 
 # baseline offensive , and serve & volley style
 tester_style = c()
-tester_style[sapply(tester_info_split, is_allround)] = 'allround'
-tester_style[sapply(tester_info_split, is_baseline_defensive)] = 'baseline_defensive'
-tester_style[sapply(tester_info_split, is_baseline_offensive)] = 'baseline_offensive'
-tester_style[sapply(tester_info_split, is_serve_volley)] = 'serve & volley'
+tester_style[sapply(tester_info_split, is_allround)] = 'Allround'
+tester_style[sapply(tester_info_split, is_baseline_defensive)] = 
+  'Baseline Defensive'
+tester_style[sapply(tester_info_split, is_baseline_offensive)] = 
+  'Baseline Offensive'
+tester_style[sapply(tester_info_split, is_serve_volley)] = 'Serve & Volley'
 
 
 ## Tester Racquet Info
@@ -313,7 +315,8 @@ get_last_paren_index = function(vector){
 }
 last_paren_indexes = sapply(paren_indexes, get_last_paren_index)
 racquet_names = substr(racquet_info_full, 1, last_paren_indexes-2)
-racquet_specs = substr(racquet_info_full, last_paren_indexes+1, nchar(racquet_names_full)-1)
+racquet_specs = substr(racquet_info_full, last_paren_indexes+1, 
+                       nchar(racquet_names_full)-1)
 
 # Extract racquet_manufacturer and racquet_model from racquet_names
 # Manufacturer is usually first word in racquet_names, with exceptions specified
@@ -399,6 +402,15 @@ cross_tension = sapply(tension_split, function(vector) vector[2])
 ## String Info
 # Extract string_material, string_construction and string_features from string_type
 string_info_full = as.character(string_data$string_type)
+
+# Fix some capitalization errors in original data
+string_info_full = gsub('core with one wrap', 'Core with One Wrap', 
+                        string_info_full)
+string_info_full = gsub('core with two wraps', 'Core with Two Wraps', 
+                        string_info_full)
+string_info_full = gsub('surface', 'Surface', string_info_full)
+
+# split into list for further processing
 string_info_split = strsplit(string_info_full, ', ')
 
 # functions to extract string_material, string_construction and string_features
@@ -411,14 +423,15 @@ get_string_material = function(vector){
 }
 get_string_construction = function(vector){
   construction = vector[vector == 'Monofilament' | 
-                                 vector == 'Central core with one wrap' |
-                                 vector == 'Central core with one wrap' |
+                                 vector == 'Central Core with One Wrap' |
+                                 vector == 'Central Core with Two Wraps' |
                                  vector == 'Multifilament' | 
                                  vector == 'Ribbon Construction']
   return(construction)
 }
+
 get_string_features = function(vector){
-  features = vector[vector == 'Structured surface' | 
+  features = vector[vector == 'Structured Surface' | 
                       vector == 'Titanium Coating' | 
                       vector == 'Titanium Fibers' | vector == 'Hybrid String']
   return(features)
@@ -734,10 +747,29 @@ review_adjectives_full = as.character(string_data$review_adjectives)
 review_adjectives_split = sapply(strsplit(review_adjectives_full, ', '), 
                                  char0_to_na)  #replaces 'character(0)' with NA
 
+# ## Capitalize All Strings
+# 
+# # function to capitalize first letter of each word in string
+# simpleCap = function(string){
+#   if(!(is.na(string))){
+#     split_string = strsplit(string, ' ')[[1]]
+#     paste(toupper(substring(split_string, 1, 1)), substring(split_string, 2),
+#           sep = '', collapse = ' ')
+#   }
+# }
+# 
+# simpleCap_list = function(vector){
+#   unname(sapply(vector, simpleCap))
+# }
+# 
+# # create vecs with capitalized strings strings
+# tester_gender = unname(sapply(tester_gender, simpleCap))
+# string_adjectives = sapply(review_adjectives_split, simpleCap_list)
+
 
 ## Update dataframe with new columns containing extracted data
 string_data1 = mutate(string_data, 
-                      'tester_gender' = tester_gender,
+                      'tester_gender' = tester_gender1,
                       'tester_age' = tester_age,
                       'tester_level' = tester_level,
                       'tester_strokes'= tester_strokes,
@@ -756,6 +788,7 @@ string_data1 = mutate(string_data,
                       'string_gauge_us' = string_gauge_us,
                       'price_adjusted' = price_adjusted,
                       'string_adjectives' = review_adjectives_split)
+
 
 # Extract the following info from scraped stringforum data and add as columns 
 # to string_data

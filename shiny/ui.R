@@ -162,10 +162,16 @@ shinyUI(dashboardPage(
                            fluidRow(
                              box(checkboxGroupInput(
                                'string_material', 'String Material',
-                               choices = get_checkbox_items_list(
-                                 'string_material'),
-                               selected = get_checkbox_items_list(
-                                 'string_material')),
+                               choices = c(sort(unique(unlist(
+                                 string_data1[["string_material"]]
+                                 [!is.na(string_data1[["string_material"]]
+                                 )]))),
+                                 none_text),
+                               selected = c(sort(unique(unlist(
+                                 string_data1[["string_material"]]
+                                 [!is.na(string_data1[["string_material"]]
+                                 )]))),
+                                 none_text)),
                                actionLink('selectall',"Select All"),
                                HTML('&ensp;'), '|', HTML('&ensp;'),
                                actionLink('clearall', "Clear All"),
@@ -173,10 +179,16 @@ shinyUI(dashboardPage(
                              box(checkboxGroupInput(
                                'string_construction', 
                                'String Construction',
-                               choices = get_checkbox_items_list(
-                                 'string_construction'),
-                               selected = get_checkbox_items_list(
-                                 'string_construction')),
+                               choices = c(sort(unique(unlist(
+                                 string_data1[["string_construction"]]
+                                 [!is.na(string_data1[["string_construction"]]
+                                         )]))),
+                                 none_text),
+                               selected = c(sort(unique(unlist(
+                                 string_data1[["string_construction"]]
+                                 [!is.na(string_data1[["string_construction"]]
+                                         )]))),
+                                 none_text)),
                                actionLink('selectall',"Select All"),
                                HTML('&ensp;'), '|', HTML('&ensp;'),
                                actionLink('clearall', "Clear All"),
@@ -184,10 +196,16 @@ shinyUI(dashboardPage(
                              box(checkboxGroupInput(
                                'string_features', 
                                'String Features',
-                               choices = get_checkbox_items_list(
-                                 'string_features'),
-                               selected = get_checkbox_items_list(
-                                 'string_features')),
+                               choices = c(sort(unique(unlist(
+                                 string_data1[["string_features"]]
+                                 [!is.na(string_data1[["string_features"]]
+                                 )]))),
+                                 none_text),
+                               selected = c(sort(unique(unlist(
+                                 string_data1[["string_features"]]
+                                 [!is.na(string_data1[["string_features"]]
+                                 )]))),
+                                 none_text)),
                                actionLink('selectall',"Select All"),
                                HTML('&ensp;'), '|', HTML('&ensp;'),
                                actionLink('clearall', "Clear All"),

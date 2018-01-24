@@ -75,26 +75,46 @@ shinyServer(function(input, output){
       string_criteria_filtered = string_criteria_filtered[rowSums(matrix) < 1,]
     }
     
+    #string_material
+    if(!(is.null(input$string_material))){
+      matrix = sapply(input$string_material,
+                      function(string) 
+                        grepl(string, 
+                              string_criteria_filtered$string_material))
+      if('None Listed' %in% input$string_material){
+        matrix = cbind(matrix, 
+                       is.na(string_criteria_filtered$string_material))
+      }
+      string_criteria_filtered = string_criteria_filtered[rowSums(matrix) > 0,]
+    }
     
-    # if(!input$price_missing){
-    #   string_criteria_filtered = string_criteria_filtered[
-    #     na.omit(string_criteria_filtered[ , 'price_adjusted']),]
-    # }
+    #string_construction
+    if(!(is.null(input$string_construction))){
+      matrix = sapply(input$string_construction,
+                      function(string) 
+                        grepl(string, 
+                              string_criteria_filtered$string_construction))
+      if('None Listed' %in% input$string_construction){
+        matrix = cbind(matrix, 
+                       is.na(string_criteria_filtered$string_construction))
+      }
+      string_criteria_filtered = string_criteria_filtered[rowSums(matrix) > 0,]
+    }
     
-    # if(!input$gauge_metric_missing){
-    #   string_criteria_filtered = string_criteria_filtered[
-    #     na.omit(string_criteria_filtered[ , 'string_gauge_metric']),]
-    # }
-    # 
-    # if(!input$gauge_metric_missing){
-    #   string_criteria_filtered = string_criteria_filtered[
-    #     na.omit(string_criteria_filtered[ , 'string_gauge_metric']),]
-    # }
-    # 
-    # if(!input$adjectives_positive_missing | !input$adjectives_negative_missing){
-    #   string_criteria_filtered = string_criteria_filtered[
-    #     na.omit(string_criteria_filtered[ , 'string_adjectives']),]
-    # }
+    #string_features
+    if(!(is.null(input$string_features))){
+      matrix = sapply(input$string_features,
+                      function(string) 
+                        grepl(string, 
+                              string_criteria_filtered$string_features))
+      if('None Listed' %in% input$string_features){
+        matrix = cbind(matrix, 
+                       is.na(string_criteria_filtered$string_features))
+      }
+      string_criteria_filtered = string_criteria_filtered[rowSums(matrix) > 0,]
+    }
+    
+
     # 
     # if(!input$material_missing){
     #   string_criteria_filtered = string_criteria_filtered[
