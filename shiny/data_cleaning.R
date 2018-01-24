@@ -16,48 +16,35 @@ library(DT)
 # Price: price_adjusted
 # Review Adjectives: review_adjectives_split
 
-string_criteria_filtered1 <- string_data1 %>% 
-  filter(num_ratings >= 25) %>%
-  filter(adjusted_price >= 5) %>%
-  filter(adjusted_price <= 25) %>%
-  filter(string_gauge_metric >= .01) %>%
-  filter(string_gauge_metric <= 500) %>%
-  filter(string_gauge_us >= 16) %>%
-  filter(string_gauge_us <= 19)
-string_criteria_filtered1
-test_filtered = filter(string_data1, grepl(vec, review_adjectives))
-test_filtered
-
-vec = c('Aramid', 'Polyester', 'Polyamid', 'Natural Gut', 'Polyethylene', 'Polyurethane', 'Zyex')
-vec1 = c('Aramid', 'Polyester', 'Polyamid', 'None Listed')
-
-
-matrix = sapply(vec,
+string_criteria_filtered = string_data1
+matrix = sapply(c('comfortable', 'soft'),
                 function(string)
                   grepl(string,
-                        string_data1$string_material))
+                        string_criteria_filtered$string_adjectives))
+string_criteria_filtered = string_criteria_filtered[rowSums(matrix) > 0,]
 
-matrix
+string_data1$string_adjectives
+matrix = sapply(c('dull'),
+                function(string)
+                  grepl(string,
+                        string_criteria_filtered$string_adjectives))
+string_criteria_filtered = string_criteria_filtered[rowSums(matrix) < 1,]
 
-string_material_filtered = string_data1[rowSums(matrix) > 0,]
-string_material_filtered
+is.null(string_criteria_filtered$string_adjectives[[3]])
 
-vec = c('soft', 'comfortable')
-vec = NULL
-if(!is.null(vec)){
-  matrix = sapply(vec, function(string) grepl(string, string_data1$review_adjectives))
-  test_filtered1 = string_data1[rowSums(matrix) > 0,]
-}
+string_criteria_filtered = string_data1 %>%
+  filter(!(num_ratings < 2)) %>%
+  filter(!(price_adjusted < 8)) %>%
+  filter(!(price_adjusted > 22)) %>%
+  filter(!(string_gauge_metric < .99)) %>%
+  filter(!(string_gauge_metric > 1.6)) %>%
+  filter(!(string_gauge_us < 16)) %>%
+  filter(!(string_gauge_us > 18))
 
-rowSums(matrix)
-string_data1$review_adjectives[vec %in% string_data1$review_adjectives]
+string_criteria_filtered = string_data1 %>%
+  filter(!(price_adjusted < 10) | is.na(price_adjusted)) 
 
-test1 = string_data1$string_material[[!(identical(string_data1$string_material, character(0)))]]
-test1 = sapply(string_data1$string_material, function(vec) !identical(vec, character(0)))
-sum(test1)
-identical(test1[[3]], character(0))
-identical(string_data1$string_material[[3]], character(0))
-test_filtered
+string_criteria_filtered
 
 models_by_manufacturer
 ## Replace string vectors with single strings
@@ -79,6 +66,8 @@ for(manufacturer in unique(string_data1$racquet_manufacturer[
       string_data1$racquet_manufacturer == manufacturer]))
 }
 models_by_manufacturer
+
+
 names(models_by_manufacturer)
 sort(unique(string_data1$racquet_manufacturer))
 list(Eastern = c('NYC', 'PBJ'), Western = c('JOK', 'ADA'))
@@ -166,7 +155,8 @@ min(string_data1$price_adjusted, na.rm = TRUE)
 max(string_data1$price_adjusted)
 
 
-print('Midsize (600 cm\u00B2)')
+
+
 # read scraped data into dataframe
 string_data <- read.csv(file = "./stringforum.csv")
 
@@ -174,7 +164,7 @@ string_data <- read.csv(file = "./stringforum.csv")
 # Gather data from tester_style field and extract tester_gender, tester_age, 
 # tester_level, tester_strokes, tester_spin, tester_style
 tester_info_full = as.character(string_data$tester_style)
-tester_info_split = strsplit(gsub(',', '', tester_styles_full), " ")
+tester_info_split = strsplit(gsub(',', '', tester_info_full), " ")
 
 # tester_gender
 # create functions to identify males vs females
@@ -310,7 +300,6 @@ tester_style[sapply(tester_info_split, is_allround)] = 'allround'
 tester_style[sapply(tester_info_split, is_baseline_defensive)] = 'baseline_defensive'
 tester_style[sapply(tester_info_split, is_baseline_offensive)] = 'baseline_offensive'
 tester_style[sapply(tester_info_split, is_serve_volley)] = 'serve & volley'
-table(tester_style)
 
 
 ## Tester Racquet Info
@@ -347,8 +336,25 @@ get_model = function(vector){
     return(paste(vector[-1], collapse = ' '))
   }
 }
-racquet_manufacturer = sapply(racquet_names_split, get_manufacturer)
-racquet_model = sapply(racquet_names_split, get_model)
+
+#function to convert empty string to NA, to identify missing values
+empty_to_na = function(string){
+  if(string == ''){
+    string = NA
+  }
+  return(string)
+}
+
+test = unname(sapply(racquet_manufacturer, empty_to_na))
+test
+
+# create raw vectors with racquet_manufacturer and racquet_model
+racquet_manufacturer_raw = sapply(racquet_names_split, get_manufacturer)
+racquet_model_raw = sapply(racquet_names_split, get_model)
+
+# replace empty strings with NAs for vectors just created
+racquet_manufacturer = unname(sapply(racquet_manufacturer_raw, empty_to_na))
+racquet_model = unname(sapply(racquet_model_raw, empty_to_na))
 
 #Extract frame_size, string_pattern, and is_widebody from racquet_specs
 #split racquet_specs into one, two or three element list
@@ -417,23 +423,36 @@ get_string_features = function(vector){
                       vector == 'Titanium Fibers' | vector == 'Hybrid String']
   return(features)
 }
-string_info_split
+
+# function to replace 'character(0)' with NA, to identify missing data
+char0_to_na = function(vec){
+  if(identical(vec, character(0))){
+    vec = NA
+  }
+  return(vec)
+}
 
 # creating vectors with string_material, string_construction_and string_features
-string_material = sapply(string_info_split, get_string_material)
-string_construction = sapply(string_info_split, get_string_construction)
-string_features = sapply(string_info_split, get_string_features)
+string_material_raw = sapply(string_info_split, get_string_material)
+string_construction_raw = sapply(string_info_split, get_string_construction)
+string_features_raw = sapply(string_info_split, get_string_features)
+
+# replacing character(0) with NA for missing info in vectors just created
+string_material = sapply(string_material_raw, char0_to_na)
+string_construction = sapply(string_construction_raw, char0_to_na)
+string_features = sapply(string_features_raw, char0_to_na)
 
 ## String Gauge
 # Extract string_gauge from string_name
 string_names_full = as.character(string_data$string_name)
 string_names_split = strsplit(string_names_full, ' ')
 string_gauge = sapply(string_names_split, function(l) l[length(l)])
+string_gauge_split = strsplit(string_gauge, '')
 
 # convet US and metric measurements and create string_gauge_metric and 
 # string_gauge_us
 
-# label hybrids
+# label hybrids - we will not convert these
 label_hybrids = function(vector){
   if(vector[1] == 'N'){
     vector = ''
@@ -446,9 +465,9 @@ label_hybrids = function(vector){
   }
   return(vector)
 }
-string_gauge_split = strsplit(string_gauge, '')
-string_gauge_labeled = sapply(string_gauge_split, label_hybrids)
-string_gauge_labeled
+
+
+# function to get return gauges in metric units
 get_metric_gauge = function(vector){
   if('.' %in% vector){
     vector = as.numeric(paste(vector, collapse = ''))
@@ -472,29 +491,55 @@ get_metric_gauge = function(vector){
   }
   return(vector)
 }
-paste(string_gauge_labeled[[991]], collapse = '')
-mean(c(1.41, 1.49))
-1.48 %in% seq(1.41, 1.49)
-seq(1.41, 1.49, .01)
-seq(1,3)
-string_gauge_metric = as.numeric(sapply(string_gauge_labeled, get_metric_gauge))
-string_gauge_metric
-table(string_gauge_metric)
+
 
 get_us_gauge = function(vector){
-  # if('.' %in% vector){
-  #   metric = as.numeric(paste(vector, collapse = ''))
-  #   if(metric %in% seq(1.34, 1.49, .01)){
-  #     vector = 15
-  #   } else if(metric %in% seq(1.23, 1.33, .01)){
-  #     vector = 16
-  #   } else if(metric %in% seq(1.16, 1.22, .01)){
-  #     vector = 17
-  #   } else if(metric %in% seq(1.06, 1.15, .01)){
-  #     vector = 18
-  #   } else if(metric %in% seq(.9, 1.05, .01)){
-  #     vector = 19
-  #   }
+  gauge_string = paste(vector, collapse = '')
+  if(gauge_string == '15' | string == '15L'){
+    string = 15
+  } else if(string == '16' | string == '16L'){
+      string = 16
+    } else if(string == '17' | string == '17L'){
+      string = 17
+    } else if(string == '18' | string == '18L'){
+      string = 18
+    }
+    else if(string == '19' | string == '19L'){
+      string = 16
+    }
+    return(string)
+  }
+  if('ab'[3] == 'L'){print('foo')}
+  if('.' %in% vector){
+    metric = as.numeric(paste(vector, collapse = ''))
+    if(metric >= 1.34 & metric <= 1.49){
+      vector = 15
+    } else if(metric >= 1.23 & metric <= 1.33){
+      vector = 16
+    } else if(metric >= 1.16 & metric <= 1.22){
+      vector = 17
+    } else if(metric >= 1.06 & metric <= 1.15){
+      vector = 18
+    } else if(metric >= .9 & metric <= 1.05){
+      vector = 19
+    }
+  } else {
+    vector = paste(vector, collapse = '')
+    if(vector == '15' | vector == '15L'){
+      vector = 15
+    } else if(vector == '16' | vector == '16L'){
+      vector = 16
+    } else if(vector == '17' | vector == '17L'){
+      vector = 17
+    } else if(vector == '18' | vector == '18L'){
+      vector = 18
+    } else if(vector == '19' | vector == '19L'){
+      vector = 19
+    }
+  }
+  return(vector)
+}
+get_us_gauge1 = function(vector){
   if('.' %in% vector){
     metric = as.numeric(paste(vector, collapse = ''))
     if(metric >= 1.34 & metric <= 1.49){
@@ -570,7 +615,11 @@ get_us_gauge = function(string){
   return(gauge_num)
 }
 
+string_gauge_labeled = sapply(string_gauge_split, label_hybrids)
+string_gauge_metric = as.numeric(sapply(string_gauge_labeled, get_metric_gauge))
+
 string_gauge_us = sapply(string_gauge_no_l, get_us_gauge)
+
 string_gauge_us
 as.numeric(string_gauge_no_l[7]) >= 1.16
 table(string_gauge_us)
@@ -682,8 +731,8 @@ price_adjusted = sapply(price_split, get_prices)
 # Review Adjectives: review_adjectives_split
 ##Extract list of review_adjectives vectors
 review_adjectives_full = as.character(string_data$review_adjectives)
-review_adjectives_split = strsplit(review_adjectives_full, ', ')
-
+review_adjectives_split = sapply(strsplit(review_adjectives_full, ', '), 
+                                 char0_to_na)  #replaces 'character(0)' with NA
 
 
 ## Update dataframe with new columns containing extracted data
@@ -706,9 +755,8 @@ string_data1 = mutate(string_data,
                       'string_gauge_metric' = string_gauge_metric,
                       'string_gauge_us' = string_gauge_us,
                       'price_adjusted' = price_adjusted,
-                      'review_adjectives' = review_adjectives_split)
+                      'string_adjectives' = review_adjectives_split)
 
-string_data1
 # Extract the following info from scraped stringforum data and add as columns 
 # to string_data
 
