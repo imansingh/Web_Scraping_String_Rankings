@@ -73,6 +73,58 @@ shinyUI(dashboardPage(
                                width = 6)
                              ),
                            fluidRow(
+                             box(checkboxGroupInput(
+                               'string_material', 'String Material',
+                               choices = c(sort(unique(unlist(
+                                 string_data1[["string_material"]]
+                                 [!is.na(string_data1[["string_material"]]
+                                 )]))),
+                                 none_text),
+                               selected = c(sort(unique(unlist(
+                                 string_data1[["string_material"]]
+                                 [!is.na(string_data1[["string_material"]]
+                                 )]))),
+                                 none_text)),
+                               actionLink('selectall',"Select All"),
+                               HTML('&ensp;'), '|', HTML('&ensp;'),
+                               actionLink('clearall', "Clear All"),
+                               width = 4),
+                             box(checkboxGroupInput(
+                               'string_construction', 
+                               'String Construction',
+                               choices = c(sort(unique(unlist(
+                                 string_data1[["string_construction"]]
+                                 [!is.na(string_data1[["string_construction"]]
+                                 )]))),
+                                 none_text),
+                               selected = c(sort(unique(unlist(
+                                 string_data1[["string_construction"]]
+                                 [!is.na(string_data1[["string_construction"]]
+                                 )]))),
+                                 none_text)),
+                               actionLink('selectall',"Select All"),
+                               HTML('&ensp;'), '|', HTML('&ensp;'),
+                               actionLink('clearall', "Clear All"),
+                               width = 4),
+                             box(checkboxGroupInput(
+                               'string_features', 
+                               'String Features',
+                               choices = c(sort(unique(unlist(
+                                 string_data1[["string_features"]]
+                                 [!is.na(string_data1[["string_features"]]
+                                 )]))),
+                                 none_text),
+                               selected = c(sort(unique(unlist(
+                                 string_data1[["string_features"]]
+                                 [!is.na(string_data1[["string_features"]]
+                                 )]))),
+                                 none_text)),
+                               actionLink('selectall',"Select All"),
+                               HTML('&ensp;'), '|', HTML('&ensp;'),
+                               actionLink('clearall', "Clear All"),
+                               width = 4)
+                             ),
+                           fluidRow(
                              column(width = 4,
                                     h4('String Gauge:'), 'Make your selection on 
                                     either the Metric or the US scale'),
@@ -158,63 +210,20 @@ shinyUI(dashboardPage(
                                                     value = TRUE),
                                       width = NULL)
                                     )
-                             ),
-                           fluidRow(
-                             box(checkboxGroupInput(
-                               'string_material', 'String Material',
-                               choices = c(sort(unique(unlist(
-                                 string_data1[["string_material"]]
-                                 [!is.na(string_data1[["string_material"]]
-                                 )]))),
-                                 none_text),
-                               selected = c(sort(unique(unlist(
-                                 string_data1[["string_material"]]
-                                 [!is.na(string_data1[["string_material"]]
-                                 )]))),
-                                 none_text)),
-                               actionLink('selectall',"Select All"),
-                               HTML('&ensp;'), '|', HTML('&ensp;'),
-                               actionLink('clearall', "Clear All"),
-                               width = 4),
-                             box(checkboxGroupInput(
-                               'string_construction', 
-                               'String Construction',
-                               choices = c(sort(unique(unlist(
-                                 string_data1[["string_construction"]]
-                                 [!is.na(string_data1[["string_construction"]]
-                                         )]))),
-                                 none_text),
-                               selected = c(sort(unique(unlist(
-                                 string_data1[["string_construction"]]
-                                 [!is.na(string_data1[["string_construction"]]
-                                         )]))),
-                                 none_text)),
-                               actionLink('selectall',"Select All"),
-                               HTML('&ensp;'), '|', HTML('&ensp;'),
-                               actionLink('clearall', "Clear All"),
-                               width = 4),
-                             box(checkboxGroupInput(
-                               'string_features', 
-                               'String Features',
-                               choices = c(sort(unique(unlist(
-                                 string_data1[["string_features"]]
-                                 [!is.na(string_data1[["string_features"]]
-                                 )]))),
-                                 none_text),
-                               selected = c(sort(unique(unlist(
-                                 string_data1[["string_features"]]
-                                 [!is.na(string_data1[["string_features"]]
-                                 )]))),
-                                 none_text)),
-                               actionLink('selectall',"Select All"),
-                               HTML('&ensp;'), '|', HTML('&ensp;'),
-                               actionLink('clearall', "Clear All"),
-                               width = 4)
                              )
                            ),
                   tabPanel("Tester Criteria",
                            h3('Only include reviews by testers with these 
                               characteristics:'),
+                           fluidRow(
+                             box(sliderInput(
+                               'tester_minimum_reviews', 
+                               'Tester Minimum # of Reviews', 
+                               min = min(string_data1$tester_reviews), 
+                               max = max(string_data1$tester_reviews), 
+                               value = 1),
+                               width = 8)
+                             ),
                            fluidRow(
                              column(width = 4,
                                     box(checkboxGroupInput(
@@ -276,7 +285,7 @@ shinyUI(dashboardPage(
                                     ),
                              column(width = 4,
                                     box(checkboxGroupInput(
-                                      'tester_style', 
+                                      'tester_playstyle', 
                                       'Tester Playing Style',
                                       choices = c('All-Around',
                                                   'Defensive Baseline',
@@ -307,14 +316,6 @@ shinyUI(dashboardPage(
                              )
                            ),
                   tabPanel("Tester Racquet Criteria",
-                           # Tester Racquet Info: racquet_manufacturer, racquet_model, frame_size, 
-                           # string_pattern
-                           # Tester Racquet Tension: main_tension, cross_tension
-                           # String Info: string_material, string_construction, string_features
-                           # String Gauge: string_gauge
-                           # Price: price_adjusted
-                           # Review Adjectives: review_adjectives_split
-                           
                            h3('Only include reviews by testers using these 
                               types of racquets:'),
                            fluidRow( 
@@ -326,9 +327,10 @@ shinyUI(dashboardPage(
                                multiple = TRUE,
                                options = list(placeholder = 
                                                 '(choose one or more)')),
-                               # actionLink('selectall',"Select All"),
-                               # HTML('&ensp;'), '|', HTML('&ensp;'),
-                               # actionLink('clearall', "Clear All"),
+                               checkboxInput('manufacturer_missing', 
+                                             'Include reviews for racquets with 
+                                              no manufacturer listed',
+                                             value = TRUE),
                                width = 4),
                              box(selectizeInput(
                                'racquet_model',
@@ -339,9 +341,10 @@ shinyUI(dashboardPage(
                                options = list(placeholder = 
                                                 '(choose one or more)',
                                               maxOptions = 2000)),
-                               # actionLink('selectall',"Select All"),
-                               # HTML('&ensp;'), '|', HTML('&ensp;'),
-                               # actionLink('clearall', "Clear All"),
+                               checkboxInput('model_missing', 
+                                             'Include reviews for racquets with 
+                                              no model listed',
+                                             value = TRUE),
                                width = 4),
                              box(selectizeInput(
                                'string_pattern',
@@ -350,9 +353,10 @@ shinyUI(dashboardPage(
                                multiple = TRUE,
                                options = list(placeholder = 
                                                 '(choose one or more)')),
-                               # actionLink('selectall',"Select All"),
-                               # HTML('&ensp;'), '|', HTML('&ensp;'),
-                               # actionLink('clearall', "Clear All"),
+                               checkboxInput('pattern_missing', 
+                                             'Include reviews for racquets with 
+                                              no string pattern listed',
+                                             value = TRUE),
                                width = 4)
                              ),
                            fluidRow(
@@ -382,12 +386,20 @@ shinyUI(dashboardPage(
                                'Tension - Main Strings', 
                                min = 35, max = 75, value = c(35,75),
                                round = TRUE),
+                               checkboxInput('main_missing', 
+                                             'Include reviews for racquets with 
+                                             no main tension listed',
+                                             value = TRUE),
                                width = 4),
                              box(sliderInput(
                                'cross_tension', 
                                'Tension - Cross Strings', 
                                min = 35, max = 75, value = c(35,75),
                                round = TRUE),
+                               checkboxInput('cross_missing', 
+                                             'Include reviews for racquets with 
+                                              no cross tension listed',
+                                             value = TRUE),
                                width = 4)
                              )
                            )

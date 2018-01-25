@@ -41,10 +41,6 @@ get_checkbox_items_list = function(string){
   return(c(sort(processed_strings), none_text))
 }
 
-string_data1[string_data1$string_constuction == get_checkbox_items_list('string_construction')[1]]
-
-test = filter(string_data1, string_construction == get_checkbox_items_list('string_construction')[3])
-
 # #Add racquet_manufacturer, racquet_model, and adjusted_price columns to string_data dataframe 
 # string_data = mutate(string_data, 
 #                      'racquet_manufacturer' = racquet_manufacturers,

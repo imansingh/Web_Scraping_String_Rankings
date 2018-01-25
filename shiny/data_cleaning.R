@@ -180,7 +180,6 @@ tester_gender = c()
 tester_gender[sapply(tester_info_split, is_male)] = 'Male'
 tester_gender[sapply(tester_info_split, is_female)] = 'Female'
 
-
 # tester_age
 # create functions to identify juniors vs adult vs young senior vs senior
 is_junior = function(vector){
@@ -253,9 +252,9 @@ is_soft_strokes = function(vector){
 
 # create vector that labels hard, medium, and soft strokes
 tester_strokes = c()
-tester_strokes[sapply(tester_info_split, is_hard_strokes)] = 'Hard'
+tester_strokes[sapply(tester_info_split, is_hard_strokes)] = 'Fast'
 tester_strokes[sapply(tester_info_split, is_medium_strokes)] = 'Medium'
-tester_strokes[sapply(tester_info_split, is_soft_strokes)] = 'Soft'
+tester_strokes[sapply(tester_info_split, is_soft_strokes)] = 'Slow'
 
 
 # tester_spin
@@ -274,10 +273,10 @@ is_little_spin = function(vector){
 tester_spin = c()
 tester_spin[sapply(tester_info_split, is_heavy_spin)] = 'Heavy'
 tester_spin[sapply(tester_info_split, is_moderate_spin)] = 'Moderate'
-tester_spin[sapply(tester_info_split, is_little_spin)] = 'Little'
+tester_spin[sapply(tester_info_split, is_little_spin)] = 'Low'
 
 
-# tester_style
+# tester_playstyle
 # create functions to identify allround vs baseline defensive vs 
 # baseline offensive vs serve & volley style
 is_allround = function(vector){
@@ -295,13 +294,13 @@ is_serve_volley = function(vector){
 
 # create vector that labels allround, baseline defensive, 
 # baseline offensive , and serve & volley style
-tester_style = c()
-tester_style[sapply(tester_info_split, is_allround)] = 'Allround'
-tester_style[sapply(tester_info_split, is_baseline_defensive)] = 
-  'Baseline Defensive'
-tester_style[sapply(tester_info_split, is_baseline_offensive)] = 
-  'Baseline Offensive'
-tester_style[sapply(tester_info_split, is_serve_volley)] = 'Serve & Volley'
+tester_playstyle = c()
+tester_playstyle[sapply(tester_info_split, is_allround)] = 'All-Around'
+tester_playstyle[sapply(tester_info_split, is_baseline_defensive)] = 
+  'Defensive Baseline'
+tester_playstyle[sapply(tester_info_split, is_baseline_offensive)] = 
+  'Offensive Baseline'
+tester_playstyle[sapply(tester_info_split, is_serve_volley)] = 'Serve & Volley'
 
 
 ## Tester Racquet Info
@@ -769,12 +768,12 @@ review_adjectives_split = sapply(strsplit(review_adjectives_full, ', '),
 
 ## Update dataframe with new columns containing extracted data
 string_data1 = mutate(string_data, 
-                      'tester_gender' = tester_gender1,
+                      'tester_gender' = tester_gender,
                       'tester_age' = tester_age,
                       'tester_level' = tester_level,
                       'tester_strokes'= tester_strokes,
                       'tester_spin' = tester_spin,
-                      'tester_style' = tester_style,
+                      'tester_playstyle' = tester_playstyle,
                       'racquet_manufacturer' = racquet_manufacturer, 
                       'racquet_model' = racquet_model,
                       'frame_size' = frame_size,
