@@ -171,31 +171,31 @@ shinyServer(function(input, output){
       string_data_filtered = string_data_filtered[rowSums(matrix) > 0,]
     }
 
-    # # tester_swing_speed
-    # if(!(is.null(input$tester_strokes))){
-    #   matrix = sapply(input$tester_strokes,
-    #                   function(string) 
-    #                     grepl(string, 
-    #                           string_data_filtered$tester_strokes))
-    #   if('None Listed' %in% input$tester_strokes){
-    #     matrix = cbind(matrix, 
-    #                    is.na(string_data_filtered$tester_strokes))
-    #   }
-    #   string_data_filtered = string_data_filtered[rowSums(matrix) > 0,]
-    # }
+    # tester_swing_speed
+    if(!(is.null(input$tester_strokes))){
+      matrix = sapply(input$tester_strokes,
+                      function(string)
+                        grepl(string,
+                              string_data_filtered$tester_strokes))
+      if('None Listed' %in% input$tester_strokes){
+        matrix = cbind(matrix,
+                       is.na(string_data_filtered$tester_strokes))
+      }
+      string_data_filtered = string_data_filtered[rowSums(matrix) > 0,]
+    }
     
-    # # tester_spin_level
-    # if(!(is.null(input$tester_spin))){
-    #   matrix = sapply(input$tester_spin,
-    #                   function(string) 
-    #                     grepl(string, 
-    #                           string_data_filtered$tester_spin))
-    #   if('None Listed' %in% input$tester_spin){
-    #     matrix = cbind(matrix, 
-    #                    is.na(string_data_filtered$tester_spin))
-    #   }
-    #   string_data_filtered = string_data_filtered[rowSums(matrix) > 0,]
-    # }
+    # tester_spin_level
+    if(!(is.null(input$tester_spin))){
+      matrix = sapply(input$tester_spin,
+                      function(string)
+                        grepl(string,
+                              string_data_filtered$tester_spin))
+      if('None Listed' %in% input$tester_spin){
+        matrix = cbind(matrix,
+                       is.na(string_data_filtered$tester_spin))
+      }
+      string_data_filtered = string_data_filtered[rowSums(matrix) > 0,]
+    }
     
     # paste all the vectors of strings into single strings for display
     string_data_filtered$string_adjectives = 
