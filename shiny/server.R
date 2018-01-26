@@ -2,7 +2,25 @@ shinyServer(function(input, output){
   #options(DT.extensions = list('ColReorder'), DT.options = list(scrollX=TRUE, scrollY=TRUE, colReorder = TRUE))
   # show strings data.table
   
-  ## Produce filtered data table based on user criteria
+  ## racquet_model_list
+  # Produce updated list of racquet models based on user selection
+  # for racquet manufacturer
+  output$racquet_model_list = renderUI({
+    filtered_model_list = sapply(input$racquet_manufacturer, 
+                                 function(string) 
+                                   unname(models_by_manufacturer[string]))
+    selectizeInput(
+      'racquet_model',
+      'Tester Racquet Model(s)',
+      choices = filtered_model_list,
+      multiple = TRUE,
+      options = list(placeholder = 
+                       '(choose one or more)',
+                     maxOptions = 2000))
+  })
+  
+  ## criteria_table
+  # Produce filtered data table based on user criteria
   output$criteria_table = DT::renderDataTable({
     
     # Filter based on string criteria
@@ -195,6 +213,113 @@ shinyServer(function(input, output){
                        is.na(string_data_filtered$tester_spin))
       }
       string_data_filtered = string_data_filtered[rowSums(matrix) > 0,]
+    }
+    
+    # Filter based on tester racquet criteria
+    # tester_racquet_manufacturer
+
+    if(!(is.null(input$racquet_manufacturer))){
+      matrix = sapply(input$racquet_manufacturer,
+                      function(string)
+                        grepl(string,
+                              string_data_filtered$racquet_manufacturer))
+      if(input$manufacturer_missing){
+        matrix = cbind(matrix,
+                       is.na(string_data_filtered$racquet_manufacturer))
+      }
+      string_data_filtered = string_data_filtered[rowSums(matrix) > 0,]
+    }
+    
+    # if(input$manufacturer_missing){
+    #   matrix = matrix(is.na(string_data_filtered$racquet_manufacturer))
+    #   if(!(is.null(input$racquet_manufacturer))){
+    #     matrix = cbind(matrix, 
+    #                    sapply(input$racquet_manufacturer, function(string) 
+    #                      grepl(string, 
+    #                            string_data_filtered$racquet_manufacturer)))
+    #   }
+    #   string_data_filtered = string_data_filtered[rowSums(matrix) > 0 , ]
+    # } else {
+    #   if(!(is.null(input$racquet_manufacturer))){
+    #     matrix = cbind(matrix, 
+    #                    sapply(input$racquet_manufacturer, function(string) 
+    #                      grepl(string, 
+    #                            string_data_filtered$racquet_manufacturer)))
+    #     string_data_filtered = string_data_filtered[rowSums(matrix) > 0 , ]
+    #     }
+    #   }
+    
+    # tester_racquet_model
+    if(!(is.null(input$racquet_model))){
+      matrix = sapply(input$racquet_model,
+                      function(string)
+                        grepl(string,
+                              string_data_filtered$racquet_model))
+      if(input$model_missing){
+        matrix = cbind(matrix,
+                       is.na(string_data_filtered$racquet_model))
+      }
+      string_data_filtered = string_data_filtered[rowSums(matrix) > 0,]
+    }
+    
+    # tester_string_pattern
+    if(!(is.null(input$string_pattern))){
+      matrix = sapply(input$string_pattern,
+                      function(string)
+                        grepl(string,
+                              string_data_filtered$string_pattern))
+      if(input$pattern_missing){
+        matrix = cbind(matrix,
+                       is.na(string_data_filtered$string_pattern))
+      }
+      string_data_filtered = string_data_filtered[rowSums(matrix) > 0,]
+    }
+    
+    # tester_frame_size
+    size_vec = unname(sapply(input$frame_size, 
+                             function(string) 
+                               strsplit(string, split = ' ')[[1]][1]))
+    
+    if(!(is.null(size_vec))){
+      matrix = sapply(size_vec,
+                      function(string)
+                        grepl(string,
+                              string_data_filtered$frame_size))
+      if('None' %in% size_vec){
+        matrix = cbind(matrix,
+                       is.na(string_data_filtered$frame_size))
+      }
+      string_data_filtered = string_data_filtered[rowSums(matrix) > 0,]
+    }
+    
+    # tester_main_tension
+    if(input$main_missing){
+      string_data_filtered = string_data_filtered %>%
+        filter(main_tension >= input$main_tension[1] |
+                 main_tension < 35 | main_tension > 75 |
+                 is.na(main_tension)) %>%
+        filter(main_tension <= input$main_tension[2] |
+                 main_tension < 35 | main_tension > 75 |
+                 is.na(main_tension))    
+    } else {
+      string_data_filtered = string_data_filtered %>%
+        filter(main_tension >= input$main_tension[1])  %>%
+        filter(main_tension <= input$main_tension[2])
+    }
+    
+    # tester_cross_tension
+    if(input$cross_missing){
+      string_data_filtered = string_data_filtered %>%
+        filter(cross_tension >= input$cross_tension[1] |
+                 cross_tension < 35 | cross_tension > 75 |
+                 is.na(cross_tension)) %>%
+        filter(cross_tension <= input$cross_tension[2] |
+                 cross_tension < 35 | cross_tension > 75 |
+                 is.na(cross_tension))    
+    } else {
+      string_data_filtered = string_data_filtered %>%
+        filter(cross_tension >= input$cross_tension[1])  %>%
+        filter(cross_tension <= input$cross_tension[2])
     }
     
     # paste all the vectors of strings into single strings for display

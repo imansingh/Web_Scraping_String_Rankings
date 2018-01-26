@@ -332,17 +332,9 @@ shinyUI(dashboardPage(
                                               no manufacturer listed',
                                              value = TRUE),
                                width = 4),
-                             box(selectizeInput(
-                               'racquet_model',
-                               'Tester Racquet Model(s)',
-                               choices = models_by_manufacturer,
-                               # choices = string_data$racquet_model,
-                               multiple = TRUE,
-                               options = list(placeholder = 
-                                                '(choose one or more)',
-                                              maxOptions = 2000)),
-                               checkboxInput('model_missing', 
-                                             'Include reviews for racquets with 
+                             box(uiOutput('racquet_model_list'),
+                               checkboxInput('model_missing',
+                                             'Include reviews for racquets with
                                               no model listed',
                                              value = TRUE),
                                width = 4),

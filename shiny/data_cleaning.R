@@ -16,6 +16,20 @@ library(DT)
 # Price: price_adjusted
 # Review Adjectives: review_adjectives_split
 
+vec = c('Midsize ( >93 in\u00B2, >593 cm\u00B2 )',
+        'MidPlus ( 93-105 in\u00B2, 594-677 cm\u00B2 )',
+        'Oversize ( >106 in\u00B2, >678 cm\u00B2 )',
+        'None Listed')
+vec
+unname(sapply(vec, function(string) strsplit(string, split = ' ')[[1]][1]))
+
+unique(string_data1$frame_size)
+
+models_by_manufacturer
+models_by_manufacturer['K2']
+vec = c('K2', 'Wimbledon', 'Babolat', 'Prince', 'Yonex')
+sapply(vec, function(string) models_by_manufacturer[string])
+
 string_criteria_filtered = string_data1
 matrix = sapply(c('comfortable', 'soft'),
                 function(string)
@@ -358,11 +372,11 @@ racquet_model_raw = sapply(racquet_names_split, get_model)
 racquet_manufacturer = unname(sapply(racquet_manufacturer_raw, empty_to_na))
 racquet_model = unname(sapply(racquet_model_raw, empty_to_na))
 
-#Extract frame_size, string_pattern, and is_widebody from racquet_specs
-#split racquet_specs into one, two or three element list
+# Extract frame_size, string_pattern, and is_widebody from racquet_specs
+# split racquet_specs into one, two or three element list
 racquet_specs_split = strsplit(racquet_specs, ", ")
 
-#functions to extract frame size, string pattern and widebody info
+# functions to extract frame size, string pattern and widebody info
 get_frame_size = function(vector){
   if(!(is.na(vector[1]))){
     if(vector[1] == '0'){
@@ -383,11 +397,19 @@ is_widebody = function(vector){
   return(vector[2] == 'WB')
 }
 
-#create vectors to label tester racquets by frame_size, string_pattern and 
-#is_widebody
+# create vectors to label tester racquets by frame_size, string_pattern and 
+# is_widebody
 frame_size = sapply(racquet_specs_split, get_frame_size)
 string_pattern = sapply(racquet_specs_split, get_string_pattern)
 is_widebody = sapply(racquet_specs_split, is_widebody)
+
+# convert empty strings to NA
+frame_size[frame_size == ''] = NA
+
+# convert abbreviations in frame_size to full names
+frame_size[frame_size == 'MS'] = 'Midsize'
+frame_size[frame_size == 'MP'] = 'MidPlus'
+frame_size[frame_size == 'OS'] = 'Oversize'
 
 ## Tester Racquet Tension
 # Extract main_tension and cross_tension from tester_tension
