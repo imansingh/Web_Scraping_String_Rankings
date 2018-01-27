@@ -397,161 +397,144 @@ shinyUI(dashboardPage(
                            )
                   )
                 ),
-              # fluidRow(
-              #   box(sliderInput("string_comfort", "Comfort", min = 1, max = 10, value = 5), width = 3),
-              #   box(sliderInput("string_control", "Control", min = 1, max = 10, value = 5), width = 3),
-              #   box(sliderInput("string_durability", "Durability", min = 1, max = 10, value = 5), width = 3),
-              #   box(sliderInput("string_feel", "Feel", min = 1, max = 10, value = 5), width = 3)
-              #   ),
-              # fluidRow(
-              #   box(sliderInput("string_power", "Power", min = 1, max = 10, value = 5), width = 3),
-              #   box(sliderInput("string_spin", "Spin", min = 1, max = 10, value = 5), width = 3),
-              #   box(sliderInput("string_tension_stability", "Tension Stability", min = 1, max = 10, value = 5), width = 3),
-              #   box(sliderInput("string_tester_satisfaction", "Overall User Satisfaction", min = 1, max = 10, value = 5), width = 3)
-              #   ),
-              #   fluidRow(h3("Only Include Strings with Multiple Reviews? Select Minimum Number of Reviews")),
-              #   fluidRow(
-              #     box(sliderInput("string_minimum_reviews", "Minimum # of Reviews", min = 1, max = 256, value = 1), width = 3)
-              #     ),
-                fluidRow(h3('[insert count] strings meet your criteria'))
-                ,fluidRow(
-                       box(DT::dataTableOutput("criteria_table"), width = 12)
-                  )
+              fluidRow(h3('[insert count] strings meet your criteria')),
+              fluidRow(box(DT::dataTableOutput("criteria_table"), width = 12))
+              ),
+      tabItem(tabName = "selector",
+              h2('Find the Right String Based on Your Criteria'),
+              fluidRow(h3('Select based either on String Preferences,
+                          or String Adjectives')),
+              fluidRow(
+                tabBox(
+                  #title = 'First tabBox',
+                  id = 'selectorInput',
+                  height = '500px',
+                  width = 12,
+                  selected = 'String Preferences',
+                  tabPanel('String Preferences',
+                           h3('Select how important these factors are to you,
+                              on a scale of 1-10:'),
+                           fluidRow(
+                             box(sliderInput('string_comfort', 'Comfort',
+                                             min = 1, max = 10, value = 5),
+                                 width = 3),
+                             box(sliderInput('string_control', 'Control',
+                                             min = 1, max = 10, value = 5),
+                                 width = 3),
+                             box(sliderInput('string_durability', 'Durability',
+                                             min = 1, max = 10, value = 5),
+                                 width = 3),
+                             box(sliderInput('string_feel', 'Feel',
+                                             min = 1, max = 10, value = 5),
+                                 width = 3)
+                           ),
+                           fluidRow(
+                             box(sliderInput('string_power', 'Power',
+                                             min = 1, max = 10, value = 5),
+                                 width = 3),
+                             box(sliderInput('string_spin', 'Spin',
+                                             min = 1, max = 10, value = 5),
+                                 width = 3),
+                             box(sliderInput('string_tension_stability',
+                                             'Tension Stability',
+                                             min = 1, max = 10, value = 5),
+                                 width = 3),
+                             box(sliderInput('string_tester_satisfaction',
+                                             'Overall User Satisfaction',
+                                             min = 1, max = 10, value = 5),
+                                 width = 3)
+                           )
+                           )
+                )
               )
+      )
     )
   )
 ))
-  #     tabItem(tabName = "selector", 
-  #             h2('Find the Right String Based on Your Criteria'),
-  #             fluidRow(h3('Select based either on String Preferences, 
-  #                         or String Adjectives')),
-  #             fluidRow(
-  #               tabBox(
-  #                 #title = 'First tabBox', 
-  #                 id = 'selectorInput', 
-  #                 height = '500px',
-  #                 width = 12,
-  #                 selected = 'String Preferences',
-  #                 tabPanel('String Preferences',
-  #                          h3('Select how important these factors are to you, 
-  #                             on a scale of 1-10:'),
-  #                          fluidRow(
-  #                            box(sliderInput('string_comfort', 'Comfort', 
-  #                                            min = 1, max = 10, value = 5), 
-  #                                width = 3),
-  #                            box(sliderInput('string_control', 'Control', 
-  #                                            min = 1, max = 10, value = 5),
-  #                                width = 3),
-  #                            box(sliderInput('string_durability', 'Durability', 
-  #                                            min = 1, max = 10, value = 5), 
-  #                                width = 3),
-  #                            box(sliderInput('string_feel', 'Feel', 
-  #                                            min = 1, max = 10, value = 5), 
-  #                                width = 3)
-  #                          ),
-  #                          fluidRow(
-  #                            box(sliderInput('string_power', 'Power', 
-  #                                            min = 1, max = 10, value = 5), 
-  #                                width = 3),
-  #                            box(sliderInput('string_spin', 'Spin', 
-  #                                            min = 1, max = 10, value = 5), 
-  #                                width = 3),
-  #                            box(sliderInput('string_tension_stability', 
-  #                                            'Tension Stability', 
-  #                                            min = 1, max = 10, value = 5), 
-  #                                width = 3),
-  #                            box(sliderInput('string_tester_satisfaction', 
-  #                                            'Overall User Satisfaction', 
-  #                                            min = 1, max = 10, value = 5), 
-  #                                width = 3)
-  #                          )
-  #                          )
-  #               )
-  #             ),
-  #             #  tabPanel("String Adjectives",
-  #             #          h3('Select whether you like or dislike these types 
-  #             #             of strings:'),
-  #             #          'Scale:', 
-  #             #          HTML('&emsp;'), '+2 = Strongly Like,', 
-  #             #          HTML('&emsp;'), '+1 = Like,', 
-  #             #          HTML('&emsp;'), '0 = Neutral,', 
-  #             #          HTML('&emsp;'), '-1 = Dislike,',
-  #             #          HTML('&emsp;'), '-2 = Strongly Dislike',
-  #             #          fluidRow(
-  #             #            box(sliderInput('soft', 'Soft', 
-  #             #                            min = -2, max = 2, value = 0), 
-  #             #                width = 2),
-  #             #            box(sliderInput('comfortable', 'Comfortable', 
-  #             #                            min = -2, max = 2, value = 0), 
-  #             #                width = 2),
-  #             #            box(sliderInput('resilient', 'Resilient', 
-  #             #                            min = -2, max = 2, value = 0), 
-  #             #                width = 2),
-  #             #            box(sliderInput('flexible', 'Flexible', 
-  #             #                            min = -2, max = 2, value = 0), 
-  #             #                width = 2),
-  #             #            box(sliderInput('elastic', 'Elastic', 
-  #             #                            min = -2, max = 2, value = 0), 
-  #             #                width = 2),
-  #             #            box(sliderInput('lively', 'Lively', 
-  #             #                            min = -2, max = 2, value = 0), 
-  #             #                width = 2)
-  #             #            ),
-  #             #          fluidRow(
-  #             #            box(sliderInput('explosive', 'Explosive', 
-  #             #                            min = -2, max = 2, value = 0), 
-  #             #                width = 2),
-  #             #            box(sliderInput('stretchy', 'Stretchy', 
-  #             #                            min = -2, max = 2, value = 0), 
-  #             #                width = 2),
-  #             #            box(sliderInput('spongy', 'Spongy', 
-  #             #                            min = -2, max = 2, value = 0), 
-  #             #                width = 2),
-  #             #            box(sliderInput('springy', 'Springy', 
-  #             #                            min = -2, max = 2, value = 0), 
-  #             #                width = 2),
-  #             #            box(sliderInput('stiff', 'Stiff', 
-  #             #                            min = -2, max = 2, value = 0), 
-  #             #                width = 2),
-  #             #            box(sliderInput('wire-like', 'Wire-like', 
-  #             #                            min = -2, max = 2, value = 0), 
-  #             #                width = 2)
-  #             #            ),
-  #             #          fluidRow(
-  #             #            box(sliderInput('solid', 'Solid', 
-  #             #                            min = -2, max = 2, value = 0), 
-  #             #                width = 2),
-  #             #            box(sliderInput('crispy', 'Crispy', 
-  #             #                            min = -2, max = 2, value = 0), 
-  #             #                width = 2),
-  #             #            box(sliderInput('precise', 'Precise', 
-  #             #                            min = -2, max = 2, value = 0), 
-  #             #                width = 2),
-  #             #            box(sliderInput('dull', 'Dull', 
-  #             #                            min = -2, max = 2, value = 0), 
-  #             #                width = 2),
-  #             #            box(sliderInput('sluggish', 'Sluggish', 
-  #             #                            min = -2, max = 2, value = 0), 
-  #             #                width = 2),
-  #             #            box(sliderInput('boring', 'Boring', 
-  #             #                            min = -2, max = 2, value = 0), 
-  #             #                width = 2)
-  #             #            ),
-  #             #          fluidRow(
-  #             #            box(sliderInput('rough', 'Rough', 
-  #             #                            min = -2, max = 2, value = 0), 
-  #             #                width = 2),
-  #             #            box(sliderInput('innovative', 'Innovative', 
-  #             #                            min = -2, max = 2, value = 0), 
-  #             #                width = 2),
-  #             #            box(sliderInput('outdated', 'Outdated', 
-  #             #                            min = -2, max = 2, value = 0), 
-  #             #                width = 2),
-  #             #            box(sliderInput('unique', 'Unique', 
-  #             #                            min = -2, max = 2, value = 0), 
-  #             #                width = 2)
-  #             #            )
-  #             #          ),
+              #  tabPanel("String Adjectives",
+              #          h3('Select whether you like or dislike these types
+              #             of strings:'),
+              #          'Scale:',
+              #          HTML('&emsp;'), '+2 = Strongly Like,',
+              #          HTML('&emsp;'), '+1 = Like,',
+              #          HTML('&emsp;'), '0 = Neutral,',
+              #          HTML('&emsp;'), '-1 = Dislike,',
+              #          HTML('&emsp;'), '-2 = Strongly Dislike',
+              #          fluidRow(
+              #            box(sliderInput('soft', 'Soft',
+              #                            min = -2, max = 2, value = 0),
+              #                width = 2),
+              #            box(sliderInput('comfortable', 'Comfortable',
+              #                            min = -2, max = 2, value = 0),
+              #                width = 2),
+              #            box(sliderInput('resilient', 'Resilient',
+              #                            min = -2, max = 2, value = 0),
+              #                width = 2),
+              #            box(sliderInput('flexible', 'Flexible',
+              #                            min = -2, max = 2, value = 0),
+              #                width = 2),
+              #            box(sliderInput('elastic', 'Elastic',
+              #                            min = -2, max = 2, value = 0),
+              #                width = 2),
+              #            box(sliderInput('lively', 'Lively',
+              #                            min = -2, max = 2, value = 0),
+              #                width = 2)
+              #            ),
+              #          fluidRow(
+              #            box(sliderInput('explosive', 'Explosive',
+              #                            min = -2, max = 2, value = 0),
+              #                width = 2),
+              #            box(sliderInput('stretchy', 'Stretchy',
+              #                            min = -2, max = 2, value = 0),
+              #                width = 2),
+              #            box(sliderInput('spongy', 'Spongy',
+              #                            min = -2, max = 2, value = 0),
+              #                width = 2),
+              #            box(sliderInput('springy', 'Springy',
+              #                            min = -2, max = 2, value = 0),
+              #                width = 2),
+              #            box(sliderInput('stiff', 'Stiff',
+              #                            min = -2, max = 2, value = 0),
+              #                width = 2),
+              #            box(sliderInput('wire-like', 'Wire-like',
+              #                            min = -2, max = 2, value = 0),
+              #                width = 2)
+              #            ),
+              #          fluidRow(
+              #            box(sliderInput('solid', 'Solid',
+              #                            min = -2, max = 2, value = 0),
+              #                width = 2),
+              #            box(sliderInput('crispy', 'Crispy',
+              #                            min = -2, max = 2, value = 0),
+              #                width = 2),
+              #            box(sliderInput('precise', 'Precise',
+              #                            min = -2, max = 2, value = 0),
+              #                width = 2),
+              #            box(sliderInput('dull', 'Dull',
+              #                            min = -2, max = 2, value = 0),
+              #                width = 2),
+              #            box(sliderInput('sluggish', 'Sluggish',
+              #                            min = -2, max = 2, value = 0),
+              #                width = 2),
+              #            box(sliderInput('boring', 'Boring',
+              #                            min = -2, max = 2, value = 0),
+              #                width = 2)
+              #            ),
+              #          fluidRow(
+              #            box(sliderInput('rough', 'Rough',
+              #                            min = -2, max = 2, value = 0),
+              #                width = 2),
+              #            box(sliderInput('innovative', 'Innovative',
+              #                            min = -2, max = 2, value = 0),
+              #                width = 2),
+              #            box(sliderInput('outdated', 'Outdated',
+              #                            min = -2, max = 2, value = 0),
+              #                width = 2),
+              #            box(sliderInput('unique', 'Unique',
+              #                            min = -2, max = 2, value = 0),
+              #                width = 2)
+              #            )
+              #          ),
   #             
   #             
   #       #fluidRow(h3("Only Include Racquets with Multiple Reviews? Select Minimum Number of Reviews")),
