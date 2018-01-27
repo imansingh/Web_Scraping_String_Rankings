@@ -19,12 +19,13 @@ shinyServer(function(input, output){
                      maxOptions = 2000))
   })
   
-  ## criteria_table
-  # Produce filtered data table based on user criteria
-  output$criteria_table = DT::renderDataTable({
-    
+  ## get string_data_filtered()
+  # reactive expression to store datatable filtered based on user criteria
+  # to be used in criteria_table and selector_table output
+  
+  get_string_data_filtered = reactive({
     # Filter based on string criteria
-    # string_minimum_reviews
+    # create string_data_filtered and filter by string_minimum_reviews
     string_data_filtered = string_data1 %>%
       filter(num_ratings >= input$string_minimum_reviews)
     
@@ -35,11 +36,11 @@ shinyServer(function(input, output){
                  is.na(price_adjusted)) %>%
         filter(price_adjusted <= input$string_price[2] |
                  is.na(price_adjusted))    
-        } else {
-          string_data_filtered = string_data_filtered %>%
-            filter(price_adjusted >= input$string_price[1])  %>%
-            filter(price_adjusted <= input$string_price[2])
-        }
+    } else {
+      string_data_filtered = string_data_filtered %>%
+        filter(price_adjusted >= input$string_price[1])  %>%
+        filter(price_adjusted <= input$string_price[2])
+    }
     
     #string_material
     if(!(is.null(input$string_material))){
@@ -149,7 +150,7 @@ shinyServer(function(input, output){
       }
       string_data_filtered = string_data_filtered[rowSums(matrix) > 0,]
     } 
-
+    
     # tester_age
     if(!(is.null(input$tester_age))){
       matrix = sapply(input$tester_age,
@@ -162,7 +163,7 @@ shinyServer(function(input, output){
       }
       string_data_filtered = string_data_filtered[rowSums(matrix) > 0,]
     }
-
+    
     # tester_style
     if(!(is.null(input$tester_playstyle))){
       matrix = sapply(input$tester_playstyle,
@@ -188,7 +189,7 @@ shinyServer(function(input, output){
       }
       string_data_filtered = string_data_filtered[rowSums(matrix) > 0,]
     }
-
+    
     # tester_swing_speed
     if(!(is.null(input$tester_strokes))){
       matrix = sapply(input$tester_strokes,
@@ -217,7 +218,6 @@ shinyServer(function(input, output){
     
     # Filter based on tester racquet criteria
     # tester_racquet_manufacturer
-
     if(!(is.null(input$racquet_manufacturer))){
       matrix = sapply(input$racquet_manufacturer,
                       function(string)
@@ -339,108 +339,40 @@ shinyServer(function(input, output){
       sapply(string_data_filtered$string_features, 
              function(vec) paste(vec, collapse = ', '))
     
-    
-    # create datatable from filtered data
-    datatable(string_data_filtered, rownames=TRUE, 
+    ## return filtered datatable
+    return(string_data_filtered)
+  })
+  
+  ## criteria_table
+  # Produce data table using filtered data from string_data_filtered()
+  output$criteria_table = DT::renderDataTable({
+    datatable(get_string_data_filtered(), rownames=TRUE, 
               extensions = list('ColReorder', 'FixedColumns', 'Responsive'),
               options = (list(scrollX = TRUE, scrollY=TRUE, colReorder = TRUE,
                               fixedColumns = TRUE, autoWidth = TRUE)))
-    # 
-    # if(!input$material_missing){
-    #   string_data_filtered = string_data_filtered[
-    #     na.omit(string_data_filtered[ , 'string_material']),]
-    # }
-    # 
-    # if(!input$construction_missing){
-    #   string_data_filtered = string_data_filtered[
-    #     na.omit(string_data_filtered[ , 'string_construction']),]
-    # }
-    # 
-    # if(!input$features_missing){
-    #   string_data_filtered = string_data_filtered[
-    #     na.omit(string_data_filtered[ , 'string_features']),]
-    # }
-    
-    # string_data_filtered = string_data1 %>%
-    #   filter(!(num_ratings < input$string_minimum_reviews)) %>%
-    #   filter(!(price_adjusted < input$string_price[1])) %>%
-    #   filter(!(price_adjusted > input$string_price[2])) %>%
-    #   filter(!(string_gauge_metric < input$string_gauge_metric[1])) %>%
-    #   filter(!(string_gauge_metric > input$string_gauge_metric[2])) %>%
-    #   filter(!(string_gauge_us < input$string_gauge_us[1])) %>%
-    #   filter(!(string_gauge_us <= input$string_gauge_us[2]))
-
-    # if(!is.null(input$string_adjectives_positive) &
-    #    input$string_adjectives_positive != ''){
-    #   print(input$string_adjectives_positive)
-    #   matrix = sapply(input$string_adjectives_positive,
-    #                   function(string)
-    #                     grepl(string,
-    #                           string_data1$string_adjectives))
-    #   print(matrix)
-    #   string_data_filtered = string_data_filtered[rowSums(matrix) > 0,]
-    # }
-    # 
-    # if(!is.null(input$string_adjectives_negative) &
-    #   input$string_adjectives_negative != ''){
-    #   matrix = sapply(input$string_adjectives_negative,
-    #                   function(string)
-    #                     grepl(string,
-    #                           string_data_filtered$string_adjectives))
-    #   string_data_filtered = string_data_filtered[rowSums(matrix) < 1,]
-    # }
-
-    # if(!is.null(input$string_material)){
-    #   matrix = sapply(input$string_material,
-    #                   function(string)
-    #                     grepl(string,
-    #                           string_data_filtered$string_material))
-    #   string_data_filtered = string_data_filtered[rowSums(matrix) > 0,]
-    # }
-    # 
-    # if(!is.null(input$string_construction)){
-    #   matrix = sapply(input$string_construction,
-    #                   function(string)
-    #                     grepl(string,
-    #                           string_data_filtered$string_construction))
-    #   string_data_filtered = string_data_filtered[rowSums(matrix) > 0,]
-    # }
-    # 
-    # if(!is.null(input$string_features)){
-    #   matrix = sapply(input$string_features,
-    #                   function(string)
-    #                     grepl(string,
-    #                           string_data_filtered$string_features))
-    #   string_data_filtered = string_data_filtered[rowSums(matrix) > 0,]
-    # }
-    
-
-    # %>%
-      #columnDefs = list(list(width = '200px', targets= c(7,8)))) %>% 
-      # formatRound(columns = c('comfort', 'control', 'durability', 'feel', 
-      #                         'power', 'spin', 'tension_stab', 'satisfaction'), 
-      #             digits = 4)
-
-    
-    
-    # string_means_weighted <- string_means_selected %>% 
-    #   arrange(desc(comfort * input$string_comfort + 
-    #                  control * input$string_control + 
-    #                  durability * input$string_durability + 
-    #                  feel * input$string_feel + 
-    #                  power * input$string_power + 
-    #                  spin * input$string_spin + 
-    #                  tension_stab * input$string_tension_stability + 
-    #                  satisfaction * input$string_tester_satisfaction))
-    # datatable(string_means_weighted, rownames=TRUE, 
-    #           extensions = list('ColReorder', 'FixedColumns', 'Responsive'),
-    #           options = (list(scrollX = TRUE, scrollY=TRUE, colReorder = TRUE, 
-    #                           fixedColumns = TRUE, autoWidth = TRUE))) %>%
-    #   #columnDefs = list(list(width = '200px', targets= c(7,8)))) %>% 
-    #   formatRound(columns = c('comfort', 'control', 'durability', 'feel', 
-    #                           'power', 'spin', 'tension_stab', 'satisfaction'), 
-    #               digits = 4)
   })
+  
+  ## selector_table
+  # Produce sorted/ranked table based on 
+  output$selector_table = DT::renderDataTable({
+    string_means_weighted = get_string_data_filtered() %>%
+      arrange(desc(comfort * input$string_comfort +
+                     control * input$string_control +
+                     durability * input$string_durability +
+                     feel * input$string_feel +
+                     power * input$string_power +
+                     spin * input$string_spin +
+                     tension_stab * input$string_tension_stability +
+                     satisfaction * input$string_tester_satisfaction))
+    datatable(string_means_weighted, rownames=TRUE,
+              extensions = list('ColReorder', 'FixedColumns', 'Responsive'),
+              options = (list(scrollX = TRUE, scrollY=TRUE, colReorder = TRUE,
+                              fixedColumns = TRUE, autoWidth = TRUE))) %>%
+      #columnDefs = list(list(width = '200px', targets= c(7,8)))) %>%
+      formatRound(columns = c('comfort', 'control', 'durability', 'feel',
+                              'power', 'spin', 'tension_stab', 'satisfaction'),
+                  digits = 4)
+    })
   
   # output$string_table <- DT::renderDataTable({
   #   string_means_selected <- string_means %>% 

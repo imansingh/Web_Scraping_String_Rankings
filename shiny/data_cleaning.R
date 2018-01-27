@@ -329,7 +329,7 @@ get_last_paren_index = function(vector){
 last_paren_indexes = sapply(paren_indexes, get_last_paren_index)
 racquet_names = substr(racquet_info_full, 1, last_paren_indexes-2)
 racquet_specs = substr(racquet_info_full, last_paren_indexes+1, 
-                       nchar(racquet_names_full)-1)
+                       nchar(racquet_info_full)-1)
 
 # Extract racquet_manufacturer and racquet_model from racquet_names
 # Manufacturer is usually first word in racquet_names, with exceptions specified
@@ -360,9 +360,6 @@ empty_to_na = function(string){
   }
   return(string)
 }
-
-test = unname(sapply(racquet_manufacturer, empty_to_na))
-test
 
 # create raw vectors with racquet_manufacturer and racquet_model
 racquet_manufacturer_raw = sapply(racquet_names_split, get_manufacturer)
@@ -482,14 +479,14 @@ string_names_full = as.character(string_data$string_name)
 string_names_split = strsplit(string_names_full, ' ')
 string_gauge = sapply(string_names_split, function(l) l[length(l)])
 string_gauge_split = strsplit(string_gauge, '')
-
+table(string_gauge)
 # convet US and metric measurements and create string_gauge_metric and 
 # string_gauge_us
 
 # label hybrids - we will not convert these
 label_hybrids = function(vector){
   if(vector[1] == 'N'){
-    vector = ''
+    vector = NA
   } else if('~' %in% vector){
     vector = 'oblong'
   } else if('/' %in% vector) {
@@ -500,6 +497,8 @@ label_hybrids = function(vector){
   return(vector)
 }
 
+# string_gauge_labeled = list with hybrids labeled
+string_gauge_labeled = sapply(string_gauge_split, label_hybrids)
 
 # function to get return gauges in metric units
 get_metric_gauge = function(vector){
@@ -526,113 +525,20 @@ get_metric_gauge = function(vector){
   return(vector)
 }
 
-
 get_us_gauge = function(vector){
   gauge_string = paste(vector, collapse = '')
-  if(gauge_string == '15' | string == '15L'){
+  if(gauge_string == '15L'){
     string = 15
-  } else if(string == '16' | string == '16L'){
-      string = 16
-    } else if(string == '17' | string == '17L'){
-      string = 17
-    } else if(string == '18' | string == '18L'){
-      string = 18
+  } else if(gauge_string == '16L'){
+      gauge_string = 16
+    } else if(gauge_string == '17L'){
+      gauge_string = 17
+    } else if(gauge_string == '18L'){
+      gauge_string = 18
+    } else if(gauge_string == '19L'){
+      gauge_string = 19
     }
-    else if(string == '19' | string == '19L'){
-      string = 16
-    }
-    return(string)
-  }
-  if('ab'[3] == 'L'){print('foo')}
-  if('.' %in% vector){
-    metric = as.numeric(paste(vector, collapse = ''))
-    if(metric >= 1.34 & metric <= 1.49){
-      vector = 15
-    } else if(metric >= 1.23 & metric <= 1.33){
-      vector = 16
-    } else if(metric >= 1.16 & metric <= 1.22){
-      vector = 17
-    } else if(metric >= 1.06 & metric <= 1.15){
-      vector = 18
-    } else if(metric >= .9 & metric <= 1.05){
-      vector = 19
-    }
-  } else {
-    vector = paste(vector, collapse = '')
-    if(vector == '15' | vector == '15L'){
-      vector = 15
-    } else if(vector == '16' | vector == '16L'){
-      vector = 16
-    } else if(vector == '17' | vector == '17L'){
-      vector = 17
-    } else if(vector == '18' | vector == '18L'){
-      vector = 18
-    } else if(vector == '19' | vector == '19L'){
-      vector = 19
-    }
-  }
-  return(vector)
-}
-get_us_gauge1 = function(vector){
-  if('.' %in% vector){
-    metric = as.numeric(paste(vector, collapse = ''))
-    if(metric >= 1.34 & metric <= 1.49){
-      vector = 15
-    } else if(metric >= 1.23 & metric <= 1.33){
-      vector = 16
-    } else if(metric >= 1.16 & metric <= 1.22){
-      vector = 17
-    } else if(metric >= 1.06 & metric <= 1.15){
-      vector = 18
-    } else if(metric >= .9 & metric <= 1.05){
-      vector = 19
-    }
-  } else {
-    vector = paste(vector, collapse = '')
-    if(vector == '15' | vector == '15L'){
-      vector = 15
-    } else if(vector == '16' | vector == '16L'){
-      vector = 16
-    } else if(vector == '17' | vector == '17L'){
-      vector = 17
-    } else if(vector == '18' | vector == '18L'){
-      vector = 18
-    } else if(vector == '19' | vector == '19L'){
-      vector = 19
-    }
-  }
-  return(vector)
-}
-collapse = function(vector){
-  gauge_string = paste(vector, collapse = '')
-  return(gauge_string)
-}
-string_gauge_collapsed = sapply(string_gauge_labeled, collapse)
-string_gauge_collapsed
-summary(string_gauge_collapsed)
-
-remove_l = function(string){
-  if(string == '15' | string == '15L'){
-    string = 15
-  } else if(string == '16' | string == '16L'){
-    string = 16
-  } else if(string == '17' | string == '17L'){
-    string = 17
-  } else if(string == '18' | string == '18L'){
-    string = 18
-  }
-  else if(string == '19' | string == '19L'){
-    string = 16
-  }
-  return(string)
-}
-
-string_gauge_no_l = sapply(string_gauge_collapsed, remove_l)
-string_gauge_no_l
-summary(string_gauge_no_l)
-
-get_us_gauge = function(string){
-  gauge_num = as.numeric(string)
+  gauge_num = as.numeric(gauge_string)
   if(!(is.na(gauge_num))){
     if(gauge_num >= 1.34 & gauge_num <= 1.49){
       gauge_num = 15
@@ -649,83 +555,9 @@ get_us_gauge = function(string){
   return(gauge_num)
 }
 
-string_gauge_labeled = sapply(string_gauge_split, label_hybrids)
+# create vectors for string_gauge_metric and string_gauge_us
 string_gauge_metric = as.numeric(sapply(string_gauge_labeled, get_metric_gauge))
-
-string_gauge_us = sapply(string_gauge_no_l, get_us_gauge)
-
-string_gauge_us
-as.numeric(string_gauge_no_l[7]) >= 1.16
-table(string_gauge_us)
-table(metric_gauge)
-typeof(us_gauge)
-summary(us_gauge)
-
-  else if(gauge_string == '16' | gauge_string == '16L'){
-    vector = 16
-  } else if(gauge_string == '17' | gauge_string == '17L'){
-    vector = 17
-  } else if(gauge_string == '18' | gauge_string == '18L'){
-    vector = 18
-  } else if(gauge_string == '19' | gauge_string == '19L'){
-    vector = 19
-  }
-  return(vector)
-}
-
-
-collapse = function(vector){
-  gauge_string = paste(vector, collapse = '')
-}
-string_gauge_collapsed = sapply(string_gauge_labeled, collapse)
-string_gauge_collapsed
-string_gauge_collapsed_no_l = sapply(string_gauge_labeled, remove_l)
-string_gauge_collapsed_no_l
-paste(string_gauge_labeled[[1]], collapse = '')
-
-string_gauge_collapsed = sapply(string_gauge_labeled, function(l) paste(l, collapse = ''))
-string_gauge_collapsed
-table(string_gauge_collapsed)
-
-as.numeric('')
-
-typeof(string_gauge_labeled[[1]]) == 'character'
-string_gauge
-forced_numerics = sapply(string_gauge_labeled, function(l) as.numeric(paste(l, collapse = '')))
-table(forced_numerics)
-%in% range(1.3, 1.4)
-1.38 %in% range(1.3, 1.4)
-us_gauge = as.numeric(sapply(string_gauge_labeled, get_us_gauge))
-string_gauge_labeled
-us_gauge
-
-us_gauge1 = as.numeric(sapply(string_gauge_labeled, get_us_gauge1))
-us_gauge1
-
-which(string_gauge %in% '1.28')
-which(string_gauge %in% '1.27')
-which(string_gauge %in% '1.13')
-
-as.numeric(string_gauge)
-string_gauge_labeled[15120]
-string_gauge_labeled
-table(string_gauge)
-table(string_gauge_labeled)
-which(string_gauge %in% 'N/A')
-string_gauge[15715]
-string_data[15120,]
-string_gauge_split
-'/' %in% string_gauge_split[[967]]
-'1' %in% string_gauge_split[[967]]
-string_gauge_split[967]
-
-
-
-string_gauge
-string_gauge_hybrid
-
-if(string_gag)
-string_gauge
+string_gauge_us = sapply(string_gauge_labeled, get_us_gauge)
 
 ## Price
 # Convert  prices to dollars, find average price, and create column for adjusted price
@@ -811,22 +643,9 @@ string_data1 = mutate(string_data,
                       'string_adjectives' = review_adjectives_split)
 
 
-# Extract the following info from scraped stringforum data and add as columns 
-# to string_data
-
-# Tester Info: tester_gender, tester_age, tester_level, tester_strokes, 
-# tester_spin, tester_style
-# Tester Racquet Info: racquet_manufacturer, racquet_model, frame_size, 
-# string_pattern
-# Tester Racquet Tension: main_tension, cross_tension
-# String Info: string_material, string_construction, string_features
-# String Gauge: string_gauge
-# Price: price_adjusted
-# Review Adjectives: review_adjectives_split
-
 
 #creating grouped dataframes
-string_grouped = stringforum %> group_by(string_name)
+string_grouped = stringforum %>% group_by(string_name)
 racquet_grouped = stringforum %>% group_by(tester_racquet)
 tester_grouped = stringforum %>% group_by(tester_name)
 

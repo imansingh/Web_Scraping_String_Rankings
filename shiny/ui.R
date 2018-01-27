@@ -38,9 +38,7 @@ shinyUI(dashboardPage(
                        ),
               fluidRow(
                 tabBox(
-                  #title = 'First tabBox', 
                   id = 'criteriaInput', 
-                  #height = '500px',
                   width = 12,
                   selected = 'String Criteria',
                   tabPanel('String Criteria',
@@ -144,8 +142,8 @@ shinyUI(dashboardPage(
                                               max(string_data1$
                                                     string_gauge_metric,
                                                   na.rm = TRUE))),
-                                      checkboxInput('gauge_metric_missing', 
-                                                    'Include strings with no 
+                                      checkboxInput('gauge_metric_missing',
+                                                    'Include strings with no
                                                     gauge listed',
                                                     value = TRUE),
                                       width = NULL)
@@ -162,8 +160,8 @@ shinyUI(dashboardPage(
                                                   na.rm = TRUE),
                                               max(string_data1$string_gauge_us,
                                                   na.rm = TRUE))),
-                                      checkboxInput('gauge_us_missing', 
-                                                    'Include strings with no 
+                                      checkboxInput('gauge_us_missing',
+                                                    'Include strings with no
                                                     gauge listed',
                                                     value = TRUE),
                                       width = NULL)
@@ -401,17 +399,19 @@ shinyUI(dashboardPage(
               fluidRow(box(DT::dataTableOutput("criteria_table"), width = 12))
               ),
       tabItem(tabName = "selector",
-              h2('Find the Right String Based on Your Criteria'),
-              fluidRow(h3('Select based either on String Preferences,
-                          or String Adjectives')),
+              h2('Find the Right String Using Data Filtered by Search Criteria'),
+              fluidRow(column(width = 12, style = 'padding:15px',
+                              h3('Select your preferred String Characteristics 
+                                 and String Adjectives:'),
+                              h4('The table below will update based on your 
+                                 choices'))
+                       ),
               fluidRow(
                 tabBox(
-                  #title = 'First tabBox',
                   id = 'selectorInput',
-                  height = '500px',
                   width = 12,
-                  selected = 'String Preferences',
-                  tabPanel('String Preferences',
+                  selected = 'String Characteristics',
+                  tabPanel('String Characteristics',
                            h3('Select how important these factors are to you,
                               on a scale of 1-10:'),
                            fluidRow(
