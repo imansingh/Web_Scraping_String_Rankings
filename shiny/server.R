@@ -348,7 +348,7 @@ shinyServer(function(input, output){
       sapply(string_data_filtered$string_features, 
              function(vec) paste(vec, collapse = ', '))
     
-    
+    # create datatable
     datatable(string_data_filtered, rownames=TRUE, 
               extensions = list('ColReorder', 'FixedColumns', 'Responsive'),
               options = (list(scrollX = TRUE, scrollY=TRUE, colReorder = TRUE,
@@ -359,7 +359,7 @@ shinyServer(function(input, output){
   # Produce sorted/ranked table based on 
   output$selector_table = DT::renderDataTable({
     
-    string_characteristics_means = get_string_data_filtered() %>% 
+    string_characteristics_weighted = get_string_data_filtered() %>% 
       group_by(string_name) %>%
       summarise(reviews_selected = n(), 
                 comfort = mean(comfort, na.rm=TRUE), 
@@ -369,9 +369,7 @@ shinyServer(function(input, output){
                 power = mean(power, na.rm=TRUE), 
                 spin = mean(spin, na.rm=TRUE), 
                 tension_stab = mean(tension_stability, na.rm=TRUE), 
-                satisfaction = mean(tester_satisfaction, na.rm=TRUE))
-    
-    string_characteristics_weighted = string_characteristics_means %>%
+                satisfaction = mean(tester_satisfaction, na.rm=TRUE)) %>%
       mutate(selector_characteristics = 
                comfort * input$string_comfort +
                control * input$string_control +
@@ -383,55 +381,57 @@ shinyServer(function(input, output){
                satisfaction * input$string_tester_satisfaction) %>%
       arrange(desc(selector_characteristics))
    
-     string_adjectives_pct = get_string_data_filtered() %>%
+     string_adjectives_weighted = get_string_data_filtered() %>%
+       # remove reviews with no adjectives listed
        filter(!(is.na(string_adjectives))) %>%
-       mutate(soft = get_adjective_pct(string_data1$string_adjectives,
-                                       'soft')) %>%
-       mutate(comfortable = get_adjective_pct(string_data1$string_adjectives,
-                                       'comfortable')) %>%
-       mutate(flexible = get_adjective_pct(string_data1$string_adjectives,
-                                       'flexible')) %>%
-       mutate(precise = get_adjective_pct(string_data1$string_adjectives,
-                                       'precise')) %>%
-       mutate(resilient = get_adjective_pct(string_data1$string_adjectives,
-                                       'resilient')) %>%
-       mutate(explosive = get_adjective_pct(string_data1$string_adjectives,
-                                       'explosive')) %>%
-       mutate(innovative = get_adjective_pct(string_data1$string_adjectives,
-                                       'innovative')) %>%
-       mutate(unique = get_adjective_pct(string_data1$string_adjectives,
-                                       'unique')) %>%
-       mutate(spongy = get_adjective_pct(string_data1$string_adjectives,
-                                       'spongy')) %>%
-       mutate(stiff = get_adjective_pct(string_data1$string_adjectives,
-                                       'stiff')) %>%
-       mutate(dull = get_adjective_pct(string_data1$string_adjectives,
-                                       'dull')) %>%
-       mutate(lively = get_adjective_pct(string_data1$string_adjectives,
-                                       'lively')) %>%
-       mutate(stretchy = get_adjective_pct(string_data1$string_adjectives,
-                                       'stretchy')) %>%
-       mutate(crispy = get_adjective_pct(string_data1$string_adjectives,
-                                       'crispy')) %>%
-       mutate(boring = get_adjective_pct(string_data1$string_adjectives,
-                                       'boring')) %>%
-       mutate(elastic = get_adjective_pct(string_data1$string_adjectives,
-                                       'elastic')) %>%
-       mutate(solid = get_adjective_pct(string_data1$string_adjectives,
-                                       'solid')) %>%
-       mutate(rough = get_adjective_pct(string_data1$string_adjectives,
-                                       'rough')) %>%
-       mutate(wire_like = get_adjective_pct(string_data1$string_adjectives,
-                                       'wire-like')) %>%
-       mutate(springy = get_adjective_pct(string_data1$string_adjectives,
-                                       'springy')) %>%
-       mutate(sluggish = get_adjective_pct(string_data1$string_adjectives,
-                                       'sluggish')) %>%
-       mutate(outdated = get_adjective_pct(string_data1$string_adjectives,
-                                       'outdated'))
-     
-     string_adjectives_means = string_adjectives_pct %>% 
+       # for each review get percentage of adjectives listed matching adjective
+       mutate(soft = get_adjective_pct(
+         get_string_data_filtered()$string_adjectives, 'soft')) %>%
+       mutate(comfortable = get_adjective_pct(
+         get_string_data_filtered()$string_adjectives, 'comfortable')) %>%
+       mutate(flexible = get_adjective_pct(
+         get_string_data_filtered()$string_adjectives, 'flexible')) %>%
+       mutate(precise = get_adjective_pct(
+         get_string_data_filtered()$string_adjectives, 'precise')) %>%
+       mutate(resilient = get_adjective_pct(
+         get_string_data_filtered()$string_adjectives, 'resilient')) %>%
+       mutate(explosive = get_adjective_pct(
+         get_string_data_filtered()$string_adjectives, 'explosive')) %>%
+       mutate(innovative = get_adjective_pct(
+         get_string_data_filtered()$string_adjectives, 'innovative')) %>%
+       mutate(unique = get_adjective_pct(
+         get_string_data_filtered()$string_adjectives, 'unique')) %>%
+       mutate(spongy = get_adjective_pct(
+         get_string_data_filtered()$string_adjectives, 'spongy')) %>%
+       mutate(stiff = get_adjective_pct(
+         get_string_data_filtered()$string_adjectives, 'stiff')) %>%
+       mutate(dull = get_adjective_pct(
+         get_string_data_filtered()$string_adjectives, 'dull')) %>%
+       mutate(lively = get_adjective_pct(
+         get_string_data_filtered()$string_adjectives, 'lively')) %>%
+       mutate(stretchy = get_adjective_pct(
+         get_string_data_filtered()$string_adjectives, 'stretchy')) %>%
+       mutate(crispy = get_adjective_pct(
+         get_string_data_filtered()$string_adjectives, 'crispy')) %>%
+       mutate(boring = get_adjective_pct(
+         get_string_data_filtered()$string_adjectives, 'boring')) %>%
+       mutate(elastic = get_adjective_pct(
+         get_string_data_filtered()$string_adjectives, 'elastic')) %>%
+       mutate(solid = get_adjective_pct(
+         get_string_data_filtered()$string_adjectives, 'solid')) %>%
+       mutate(rough = get_adjective_pct(
+         get_string_data_filtered()$string_adjectives, 'rough')) %>%
+       mutate(wire_like = get_adjective_pct(
+         get_string_data_filtered()$string_adjectives, 'wire-like')) %>%
+       mutate(springy = get_adjective_pct(
+         get_string_data_filtered()$string_adjectives, 'springy')) %>%
+       mutate(sluggish = get_adjective_pct(
+         get_string_data_filtered()$string_adjectives, 'sluggish')) %>%
+       mutate(outdated = get_adjective_pct(
+         get_string_data_filtered()$string_adjectives, 'outdated')) %>%
+       # group reviews by string name
        group_by(string_name) %>%
+       # for reviews grouped by string name get mean % for each adjective
        summarise(reviews_selected = n(),
                  soft = mean(soft),
                  comfortable = mean(comfortable),
@@ -454,9 +454,8 @@ shinyServer(function(input, output){
                  wire_like = mean(wire_like),
                  springy = mean(springy),
                  sluggish = mean(sluggish),
-                 outdated = mean(outdated))
-     
-     string_adjectives_weighted = string_adjectives_means %>%
+                 outdated = mean(outdated)) %>%
+       # get adjective selector score by 
        mutate(selector_adjectives = 
                 soft * input$soft +
                 comfortable * input$comfortable +
@@ -491,14 +490,16 @@ shinyServer(function(input, output){
                               'power', 'spin', 'tension_stab', 'satisfaction'),
                   digits = 4)
     
-    datatable(string_adjectives_weighted, rownames=TRUE,
-              extensions = list('ColReorder', 'FixedColumns', 'Responsive'),
-              options = (list(scrollX = TRUE, scrollY=TRUE, colReorder = TRUE,
-                              fixedColumns = TRUE, autoWidth = TRUE))) %>%
+    # datatable(string_adjectives_weighted, rownames=TRUE,
+    #           extensions = list('ColReorder', 'FixedColumns', 'Responsive'),
+    #           options = (list(scrollX = TRUE, scrollY=TRUE, colReorder = TRUE,
+    #                           fixedColumns = TRUE, autoWidth = TRUE))) 
+    # 
+    #%>%
       #columnDefs = list(list(width = '200px', targets= c(7,8)))) %>%
-      formatRound(columns = c('comfort', 'control', 'durability', 'feel',
-                              'power', 'spin', 'tension_stab', 'satisfaction'),
-                  digits = 4)
+      # formatRound(columns = c('comfort', 'control', 'durability', 'feel',
+      #                         'power', 'spin', 'tension_stab', 'satisfaction'),
+      #            digits = 4)
     })
   
   # output$string_table <- DT::renderDataTable({
