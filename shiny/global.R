@@ -40,18 +40,29 @@ get_checkbox_items_list = function(string){
   return(c(sort(processed_strings), none_text))
 }
 
-## String Criteria
-# Created nested list of racquet models by manufacturer
-models_by_manufacturer = list()
-for(manufacturer in unique(string_data1$racquet_manufacturer[
-  string_data1$racquet_manufacturer != ''])){
-  models_by_manufacturer[[manufacturer]] = 
-    sort(unique(string_data1$racquet_model[
-      string_data1$racquet_manufacturer == manufacturer]))
+# ## models_by_manufacturer
+# # Create nested list of racquet models by manufacturer
+# models_by_manufacturer = list()
+# for(manufacturer in unique(string_data1$racquet_manufacturer[
+#   string_data1$racquet_manufacturer != ''])){
+#   models_by_manufacturer[[manufacturer]] = 
+#     sort(unique(string_data1$racquet_model[
+#       string_data1$racquet_manufacturer == manufacturer]))
+# }
+
+
+## get_adjective_pct
+# create vec that gives percentage of of strings in vec that match
+
+get_adjective_pct = function(string_list, str_to_match){
+  sapply( # this takes list of logical vectors and divides sum/length to get pct
+    sapply(string_list[!(is.na(string_list))],  # this returns list of logical vectors
+           function(string_vec) grepl(str_to_match, string_vec)),
+    function(logical_vec) sum(logical_vec)/length(logical_vec))
 }
 
 
-## String Selector
+
 #creating grouped dataframes by string_name, tester_racquet and tester_name
 string_grouped = string_data %>% group_by(string_name)
 racquet_grouped = string_data %>% group_by(tester_racquet)
