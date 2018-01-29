@@ -412,35 +412,35 @@ shinyUI(dashboardPage(
                   selected = 'String Characteristics',
                   tabPanel('String Characteristics',
                            h3('Select how important these factors are to you,
-                              on a scale of 1-10:'),
+                              on a scale of 0-10:'),
                            fluidRow(
                              box(sliderInput('string_comfort', 'Comfort',
-                                             min = 1, max = 10, value = 5),
+                                             min = 0, max = 10, value = 5),
                                  width = 3),
                              box(sliderInput('string_control', 'Control',
-                                             min = 1, max = 10, value = 5),
+                                             min = 0, max = 10, value = 5),
                                  width = 3),
                              box(sliderInput('string_durability', 'Durability',
-                                             min = 1, max = 10, value = 5),
+                                             min = 0, max = 10, value = 5),
                                  width = 3),
                              box(sliderInput('string_feel', 'Feel',
-                                             min = 1, max = 10, value = 5),
+                                             min = 0, max = 10, value = 5),
                                  width = 3)
                            ),
                            fluidRow(
                              box(sliderInput('string_power', 'Power',
-                                             min = 1, max = 10, value = 5),
+                                             min = 0, max = 10, value = 5),
                                  width = 3),
                              box(sliderInput('string_spin', 'Spin',
-                                             min = 1, max = 10, value = 5),
+                                             min = 0, max = 10, value = 5),
                                  width = 3),
                              box(sliderInput('string_tension_stability',
                                              'Tension Stability',
-                                             min = 1, max = 10, value = 5),
+                                             min = 0, max = 10, value = 5),
                                  width = 3),
                              box(sliderInput('string_tester_satisfaction',
                                              'Overall User Satisfaction',
-                                             min = 1, max = 10, value = 5),
+                                             min = 0, max = 10, value = 5),
                                  width = 3)
                              )
                            ),
@@ -530,103 +530,42 @@ shinyUI(dashboardPage(
                            )
                   )),
               fluidRow(h3('Table Options')),
-              fluidRow(box('insert slider about minimum reviews meeting criteria',
-                           'insert checkbox about selecting by characteristics,
-                           adjectives, or both (with dropdown panel saying what
-                           weights to assign',
-                width=12)
-                ),
+              fluidRow(box(radioButtons('table_choice',
+                           'Do you want to rank strings based on
+                           String Characteristics, String Adjectives, or Both?',
+                           choices = list('String Characteristics' = 
+                                            'characteristics',
+                                          'String Adjectives' =
+                                            'adjectives',
+                                          'Both (Weighted Average)' = 'both'),
+                           selected = 'characteristics'),
+                           conditionalPanel('input.table_choice == "both"',
+                                            'Select your preferred weights:',
+                                            fluidRow(
+                                              box(sliderInput(
+                                                'c_weight',
+                                                'String Characteristics Weight',
+                                                min = 0,
+                                                max = 10,
+                                                value = 5),
+                                                width = 6),
+                                              box(sliderInput(
+                                                'a_weight',
+                                                'String Adjectives Weight',
+                                                min = 0,
+                                                max = 10,
+                                                value = 5),
+                                                width = 6)
+                                            )
+                           ),
+                width=8)),
               fluidRow(h3('[insert count] strings meet your criteria')),
               fluidRow(box(DT::dataTableOutput("selector_table"), width = 12))
       )
     )
   )
 ))
-               # tabPanel("String Adjectives",
-               #         h3('Select whether you like or dislike these types
-               #            of strings:'),
-               #         'Scale:',
-               #         HTML('&emsp;'), '+2 = Strongly Like,',
-               #         HTML('&emsp;'), '+1 = Like,',
-               #         HTML('&emsp;'), '0 = Neutral,',
-               #         HTML('&emsp;'), '-1 = Dislike,',
-               #         HTML('&emsp;'), '-2 = Strongly Dislike',
-               #         fluidRow(
-               #           box(sliderInput('soft', 'Soft',
-               #                           min = -2, max = 2, value = 0),
-               #               width = 2),
-               #           box(sliderInput('comfortable', 'Comfortable',
-               #                           min = -2, max = 2, value = 0),
-               #               width = 2),
-               #           box(sliderInput('resilient', 'Resilient',
-               #                           min = -2, max = 2, value = 0),
-               #               width = 2),
-               #           box(sliderInput('flexible', 'Flexible',
-               #                           min = -2, max = 2, value = 0),
-               #               width = 2),
-               #           box(sliderInput('elastic', 'Elastic',
-               #                           min = -2, max = 2, value = 0),
-               #               width = 2),
-               #           box(sliderInput('lively', 'Lively',
-               #                           min = -2, max = 2, value = 0),
-               #               width = 2)
-               #           ),
-               #         fluidRow(
-               #           box(sliderInput('explosive', 'Explosive',
-               #                           min = -2, max = 2, value = 0),
-               #               width = 2),
-               #           box(sliderInput('stretchy', 'Stretchy',
-               #                           min = -2, max = 2, value = 0),
-               #               width = 2),
-               #           box(sliderInput('spongy', 'Spongy',
-               #                           min = -2, max = 2, value = 0),
-               #               width = 2),
-               #           box(sliderInput('springy', 'Springy',
-               #                           min = -2, max = 2, value = 0),
-               #               width = 2),
-               #           box(sliderInput('stiff', 'Stiff',
-               #                           min = -2, max = 2, value = 0),
-               #               width = 2),
-               #           box(sliderInput('wire-like', 'Wire-like',
-               #                           min = -2, max = 2, value = 0),
-               #               width = 2)
-               #           ),
-               #         fluidRow(
-               #           box(sliderInput('solid', 'Solid',
-               #                           min = -2, max = 2, value = 0),
-               #               width = 2),
-               #           box(sliderInput('crispy', 'Crispy',
-               #                           min = -2, max = 2, value = 0),
-               #               width = 2),
-               #           box(sliderInput('precise', 'Precise',
-               #                           min = -2, max = 2, value = 0),
-               #               width = 2),
-               #           box(sliderInput('dull', 'Dull',
-               #                           min = -2, max = 2, value = 0),
-               #               width = 2),
-               #           box(sliderInput('sluggish', 'Sluggish',
-               #                           min = -2, max = 2, value = 0),
-               #               width = 2),
-               #           box(sliderInput('boring', 'Boring',
-               #                           min = -2, max = 2, value = 0),
-               #               width = 2)
-               #           ),
-               #         fluidRow(
-               #           box(sliderInput('rough', 'Rough',
-               #                           min = -2, max = 2, value = 0),
-               #               width = 2),
-               #           box(sliderInput('innovative', 'Innovative',
-               #                           min = -2, max = 2, value = 0),
-               #               width = 2),
-               #           box(sliderInput('outdated', 'Outdated',
-               #                           min = -2, max = 2, value = 0),
-               #               width = 2),
-               #           box(sliderInput('unique', 'Unique',
-               #                           min = -2, max = 2, value = 0),
-               #               width = 2)
-               #           )
-               #         ),
-  #             
+     
   #             
   #       #fluidRow(h3("Only Include Racquets with Multiple Reviews? Select Minimum Number of Reviews")),
   #       #fluidRow(

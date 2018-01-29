@@ -359,8 +359,10 @@ shinyServer(function(input, output){
   # Produce sorted/ranked table based on 
   output$selector_table = DT::renderDataTable({
     
-    string_characteristics_weighted = get_string_data_filtered() %>% 
+    string_characteristics_weighted = get_string_data_filtered() %>%
+      # group filtered data frame by string names
       group_by(string_name) %>%
+      # get the mean scores for each string
       summarise(reviews_selected = n(), 
                 comfort = mean(comfort, na.rm=TRUE), 
                 control = mean(control, na.rm=TRUE), 
@@ -370,6 +372,7 @@ shinyServer(function(input, output){
                 spin = mean(spin, na.rm=TRUE), 
                 tension_stab = mean(tension_stability, na.rm=TRUE), 
                 satisfaction = mean(tester_satisfaction, na.rm=TRUE)) %>%
+      # multiply means by input to get weighted means, then sum to get score
       mutate(selector_characteristics = 
                comfort * input$string_comfort +
                control * input$string_control +
@@ -380,6 +383,11 @@ shinyServer(function(input, output){
                tension_stab * input$string_tension_stability +
                satisfaction * input$string_tester_satisfaction) %>%
       arrange(desc(selector_characteristics))
+    
+    string_characteristics_weighted = mutate(string_characteristics_weighted,
+                                             selector_characteristics = 
+                                               scale(string_characteristics_weighted$
+                                                       selector_characteristics))
    
      string_adjectives_weighted = get_string_data_filtered() %>%
        # remove reviews with no adjectives listed
@@ -455,7 +463,7 @@ shinyServer(function(input, output){
                  springy = mean(springy),
                  sluggish = mean(sluggish),
                  outdated = mean(outdated)) %>%
-       # get adjective selector score by 
+       # multiply means by user input to get weighted means, then sum for score 
        mutate(selector_adjectives = 
                 soft * input$soft +
                 comfortable * input$comfortable +
@@ -480,20 +488,29 @@ shinyServer(function(input, output){
                 sluggish * input$sluggish +
                 outdated * input$outdated) %>%
        arrange(desc(selector_adjectives))
+     
+     string_adjectives_weighted = mutate(string_adjectives_weighted,
+                                              selector_adjectives = 
+                                                scale(string_adjectives_weighted$
+                                                        selector_adjectives))
+     
+     if(input$table_choice == 'characteristics'){
+       datatable(string_characteristics_weighted, rownames=TRUE,
+                 extensions = list('ColReorder', 'FixedColumns', 'Responsive'),
+                 options = (list(scrollX = TRUE, scrollY=TRUE, colReorder = TRUE,
+                                 fixedColumns = TRUE, autoWidth = TRUE))) %>%
+         #columnDefs = list(list(width = '200px', targets= c(7,8)))) %>%
+         formatRound(columns = c('comfort', 'control', 'durability', 'feel',
+                                 'power', 'spin', 'tension_stab', 'satisfaction'),
+                     digits = 4)
+     } else if(input$table_choice == 'adjectives'){
+       datatable(string_adjectives_weighted, rownames=TRUE,
+                 extensions = list('ColReorder', 'FixedColumns', 'Responsive'),
+                 options = (list(scrollX = TRUE, scrollY=TRUE, colReorder = TRUE,
+                                 fixedColumns = TRUE, autoWidth = TRUE)))
+       }
     
-    datatable(string_characteristics_weighted, rownames=TRUE,
-              extensions = list('ColReorder', 'FixedColumns', 'Responsive'),
-              options = (list(scrollX = TRUE, scrollY=TRUE, colReorder = TRUE,
-                              fixedColumns = TRUE, autoWidth = TRUE))) %>%
-      #columnDefs = list(list(width = '200px', targets= c(7,8)))) %>%
-      formatRound(columns = c('comfort', 'control', 'durability', 'feel',
-                              'power', 'spin', 'tension_stab', 'satisfaction'),
-                  digits = 4)
-    
-    # datatable(string_adjectives_weighted, rownames=TRUE,
-    #           extensions = list('ColReorder', 'FixedColumns', 'Responsive'),
-    #           options = (list(scrollX = TRUE, scrollY=TRUE, colReorder = TRUE,
-    #                           fixedColumns = TRUE, autoWidth = TRUE))) 
+
     # 
     #%>%
       #columnDefs = list(list(width = '200px', targets= c(7,8)))) %>%
