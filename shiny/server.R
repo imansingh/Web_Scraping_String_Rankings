@@ -359,11 +359,11 @@ shinyServer(function(input, output){
   # Produce sorted/ranked table based on 
   output$selector_table = DT::renderDataTable({
     
-    string_characteristics_weighted = get_string_data_filtered() %>%
+    selector_table_characteristics = get_string_data_filtered() %>%
       # group filtered data frame by string names
       group_by(string_name) %>%
       # get the mean scores for each string
-      summarise(reviews_selected = n(), 
+      summarise(num_char_reviews = n(), 
                 comfort = mean(comfort, na.rm=TRUE), 
                 control = mean(control, na.rm=TRUE), 
                 durability = mean(durability, na.rm=TRUE), 
@@ -372,8 +372,8 @@ shinyServer(function(input, output){
                 spin = mean(spin, na.rm=TRUE), 
                 tension_stab = mean(tension_stability, na.rm=TRUE), 
                 satisfaction = mean(tester_satisfaction, na.rm=TRUE)) %>%
-      # multiply means by input to get weighted means, then sum to get score
-      mutate(selector_characteristics = 
+      # multiply means by input to get weighted means, then sum to get c_score
+      mutate(characteristics_score = 
                comfort * input$string_comfort +
                control * input$string_control +
                durability * input$string_durability +
@@ -382,14 +382,19 @@ shinyServer(function(input, output){
                spin * input$string_spin +
                tension_stab * input$string_tension_stability +
                satisfaction * input$string_tester_satisfaction) %>%
-      arrange(desc(selector_characteristics))
+      # arrange by c_score, descennding
+      arrange(desc(characteristics_score))
     
-    string_characteristics_weighted = mutate(string_characteristics_weighted,
-                                             selector_characteristics = 
-                                               scale(string_characteristics_weighted$
-                                                       selector_characteristics))
-   
-     string_adjectives_weighted = get_string_data_filtered() %>%
+    
+    # convert c_score to percentile - scale for z-stat, then pnorm
+    selector_table_characteristics = 
+      selector_table_characteristics %>%
+      mutate(characteristics_score = 
+               pnorm(scale(selector_table_characteristics$
+                             characteristics_score)) * 
+               100)
+
+     selector_table_adjectives = get_string_data_filtered() %>%
        # remove reviews with no adjectives listed
        filter(!(is.na(string_adjectives))) %>%
        # for each review get percentage of adjectives listed matching adjective
@@ -440,7 +445,7 @@ shinyServer(function(input, output){
        # group reviews by string name
        group_by(string_name) %>%
        # for reviews grouped by string name get mean % for each adjective
-       summarise(reviews_selected = n(),
+       summarise(num_adjec_reviews = n(),
                  soft = mean(soft),
                  comfortable = mean(comfortable),
                  flexible = mean(flexible),
@@ -464,7 +469,7 @@ shinyServer(function(input, output){
                  sluggish = mean(sluggish),
                  outdated = mean(outdated)) %>%
        # multiply means by user input to get weighted means, then sum for score 
-       mutate(selector_adjectives = 
+       mutate(adjectives_score = 
                 soft * input$soft +
                 comfortable * input$comfortable +
                 flexible * input$flexible +
@@ -487,15 +492,26 @@ shinyServer(function(input, output){
                 springy * input$springy +
                 sluggish * input$sluggish +
                 outdated * input$outdated) %>%
-       arrange(desc(selector_adjectives))
+       # arrange by adjectives_score descending
+       arrange(desc(adjectives_score))
      
-     string_adjectives_weighted = mutate(string_adjectives_weighted,
-                                              selector_adjectives = 
-                                                scale(string_adjectives_weighted$
-                                                        selector_adjectives))
+     # convert adjectives_score to percentile - scale for z-stat, then pnorm
+     selector_table_adjectives =
+       selector_table_adjectives %>%
+       mutate(adjectives_score = 
+                pnorm(scale(selector_table_adjectives$adjectives_score)) * 
+                100)
+     
+     selector_table_both = selector_table_characteristics %>%
+       full_join(selector_table_adjectives, by = 'string_name') %>%
+       mutate(combined_score = 
+         (characteristics_score * input$c_weight +
+            adjectives_score * input$a_weight) /
+           sum(input$c_weight, input$a_weight)) %>%
+       arrange(desc(combined_score[,]))
      
      if(input$table_choice == 'characteristics'){
-       datatable(string_characteristics_weighted, rownames=TRUE,
+       datatable(selector_table_characteristics, rownames=TRUE,
                  extensions = list('ColReorder', 'FixedColumns', 'Responsive'),
                  options = (list(scrollX = TRUE, scrollY=TRUE, colReorder = TRUE,
                                  fixedColumns = TRUE, autoWidth = TRUE))) %>%
@@ -504,7 +520,12 @@ shinyServer(function(input, output){
                                  'power', 'spin', 'tension_stab', 'satisfaction'),
                      digits = 4)
      } else if(input$table_choice == 'adjectives'){
-       datatable(string_adjectives_weighted, rownames=TRUE,
+       datatable(selector_table_adjectives, rownames=TRUE,
+                 extensions = list('ColReorder', 'FixedColumns', 'Responsive'),
+                 options = (list(scrollX = TRUE, scrollY=TRUE, colReorder = TRUE,
+                                 fixedColumns = TRUE, autoWidth = TRUE)))
+     } else if(input$table_choice == 'both'){
+       datatable(selector_table_both, rownames=TRUE,
                  extensions = list('ColReorder', 'FixedColumns', 'Responsive'),
                  options = (list(scrollX = TRUE, scrollY=TRUE, colReorder = TRUE,
                                  fixedColumns = TRUE, autoWidth = TRUE)))
