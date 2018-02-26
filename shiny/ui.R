@@ -12,7 +12,7 @@ shinyUI(dashboardPage(
       menuItem('String Selector', tabName = 'selector', 
                icon = icon('bar-chart')
                ),
-      menuItem('String Profiles', tabName = 'profile', 
+      menuItem('String Profiles', tabName = 'string_profile', 
                icon = icon('line-chart')
                ),
       br(),
@@ -124,52 +124,115 @@ shinyUI(dashboardPage(
                              ),
                            fluidRow(
                              column(width = 4,
-                                    h4('String Gauge:'), 'Make your selection on 
-                                    either the Metric or the US scale'),
-                             column(width = 4,
-                                    box(sliderInput(
-                                      'string_gauge_metric', 
-                                      'String Gauge - Metric (mm)',
-                                      min = min(string_data1$
-                                                  string_gauge_metric,
-                                                na.rm = TRUE),
-                                      max = max(string_data1$
-                                                  string_gauge_metric,
-                                                na.rm = TRUE),
-                                      value=c(min(string_data1$
-                                                    string_gauge_metric,
-                                                  na.rm = TRUE),
-                                              max(string_data1$
-                                                    string_gauge_metric,
-                                                  na.rm = TRUE))),
-                                      checkboxInput('gauge_metric_missing',
-                                                    'Include strings with no
-                                                    gauge listed',
-                                                    value = TRUE),
-                                      width = NULL)
+                                    h4('String Gauge:')
                                     ),
                              column(width = 4,
-                                    box(sliderInput(
-                                      'string_gauge_us', 
-                                      'String Gauge - US',
-                                      min = min(string_data1$string_gauge_us,
-                                                na.rm = TRUE),
-                                      max = max(string_data1$string_gauge_us,
-                                                na.rm = TRUE),
-                                      value=c(min(string_data1$string_gauge_us,
+                                    box(radioButtons(
+                                      'gauge_choice',
+                                      'Do you want to use Metric or US scale?',
+                                      choices = list(
+                                        'Metric Scale' = 'metric',
+                                        'US Scale' = 'US'),
+                                        selected = 'metric'),
+                                      width = NULL
+                                      )
+                                    ),
+                             column(width = 4,
+                                    conditionalPanel(
+                                      'input.gauge_choice == "metric"',
+                                      box(sliderInput(
+                                        'string_gauge_metric',
+                                        'String Gauge - Metric (mm)',
+                                        min = min(string_data1$
+                                                    string_gauge_metric,
                                                   na.rm = TRUE),
-                                              max(string_data1$string_gauge_us,
-                                                  na.rm = TRUE))),
-                                      checkboxInput('gauge_us_missing',
-                                                    'Include strings with no
-                                                    gauge listed',
-                                                    value = TRUE),
-                                      width = NULL)
+                                        max = max(string_data1$
+                                                    string_gauge_metric,
+                                                  na.rm = TRUE),
+                                       value=c(min(string_data1$
+                                                     string_gauge_metric,
+                                                   na.rm = TRUE),
+                                                       max(string_data1$
+                                                             string_gauge_metric,
+                                                           na.rm = TRUE))),
+                                               checkboxInput('gauge_metric_missing',
+                                                             'Include strings with no
+                                                             gauge listed',
+                                                             value = TRUE),
+                                       width = NULL)
+                                      ),
+                                    conditionalPanel(
+                                      'input.gauge_choice == "US"',
+                                      box(sliderInput(
+                                       'string_gauge_us', 
+                                       'String Gauge - US',
+                                       min = min(string_data1$string_gauge_us,
+                                                 na.rm = TRUE),
+                                       max = max(string_data1$string_gauge_us,
+                                                 na.rm = TRUE),
+                                       value=c(min(string_data1$string_gauge_us,
+                                                   na.rm = TRUE),
+                                               max(string_data1$string_gauge_us,
+                                                   na.rm = TRUE))),
+                                       checkboxInput('gauge_us_missing',
+                                                     'Include strings with no
+                                                     gauge listed',
+                                                     value = TRUE),
+                                       width = NULL)
+                                      )
                                     )
                              ),
+                           #            
+                           # fluidRow(
+                           #   column(width = 4,
+                           #          h4('String Gauge:'), 'Select either
+                           #          Metric or US scale?'),
+                           #   
+                           # 
+                           #   column(width = 4,
+                           #          box(sliderInput(
+                           #            'string_gauge_metric', 
+                           #            'String Gauge - Metric (mm)',
+                           #            min = min(string_data1$
+                           #                        string_gauge_metric,
+                           #                      na.rm = TRUE),
+                           #            max = max(string_data1$
+                           #                        string_gauge_metric,
+                           #                      na.rm = TRUE),
+                           #            value=c(min(string_data1$
+                           #                          string_gauge_metric,
+                           #                        na.rm = TRUE),
+                           #                    max(string_data1$
+                           #                          string_gauge_metric,
+                           #                        na.rm = TRUE))),
+                           #            checkboxInput('gauge_metric_missing',
+                           #                          'Include strings with no
+                           #                          gauge listed',
+                           #                          value = TRUE),
+                           #            width = NULL)
+                           #          ),
+                           #   column(width = 4,
+                           #          box(sliderInput(
+                           #            'string_gauge_us', 
+                           #            'String Gauge - US',
+                           #            min = min(string_data1$string_gauge_us,
+                           #                      na.rm = TRUE),
+                           #            max = max(string_data1$string_gauge_us,
+                           #                      na.rm = TRUE),
+                           #            value=c(min(string_data1$string_gauge_us,
+                           #                        na.rm = TRUE),
+                           #                    max(string_data1$string_gauge_us,
+                           #                        na.rm = TRUE))),
+                           #            checkboxInput('gauge_us_missing',
+                           #                          'Include strings with no
+                           #                          gauge listed',
+                           #                          value = TRUE),
+                           #            width = NULL)
+                           #          )
+                           #   ),
                            fluidRow(
                              column(width = 4,
-                                    h4('String Adjectives (Positive):'),
+                                    h4('String Adjectives (Include):'),
                                     'Only include strings where one or more
                                     reviewers listed these adjectives'),
                              column(width = 8,
@@ -190,7 +253,7 @@ shinyUI(dashboardPage(
                              ),
                            fluidRow(
                              column(width = 4,
-                                    h4('String Adjectives (Negative):'),
+                                    h4('String Adjectives (Exclude):'),
                                     'Do not include any strings where a reviewer
                                     listed these adjectives'),
                              column(width = 8,
@@ -395,8 +458,9 @@ shinyUI(dashboardPage(
                            )
                   )
                 ),
-              fluidRow(h3('[insert count] reviews meet your criteria')),
-              fluidRow(box(DT::dataTableOutput("criteria_table"), width = 12))
+              #fluidRow(column(width = 12, style = 'padding:15px',
+              fluidRow(h3(style = 'padding:15px', textOutput('table_title'))),
+              fluidRow(box(DT::dataTableOutput('criteria_table'), width = 12))
               ),
       tabItem(tabName = "selector",
               h2('Find the Right String Using Data Filtered by Search Criteria'),
@@ -561,7 +625,47 @@ shinyUI(dashboardPage(
                 width=8)),
               fluidRow(h3('[insert count] strings meet your criteria')),
               fluidRow(box(DT::dataTableOutput("selector_table"), width = 12))
-      )
+              ),
+      tabItem(tabName = "string_profile",
+              h2('Find out Information about Selected String'),
+              fluidRow(column(width = 12, style = 'padding:15px',
+                              h3('Select a string:'),
+                              h4('The information below will update based on your 
+                                 choice'))
+                              ),
+              fluidRow(
+                box(selectizeInput(
+                  'string_selected', 
+                  'Select String', 
+                  choices = sort(string_data1$string_name),
+                  options = list(placeholder = 
+                                   '(type part of the name)')),
+                  width = 4)
+                ),
+              fluidRow(
+                tabBox(
+                  id = 'string_profile_output',
+                  width = 12,
+                  selected = 'string_reviews',
+                  tabPanel('string_reviews',
+                           box(DT::dataTableOutput("review_table"), 
+                               width = NULL)
+                           ),
+                  tabPanel('word_cloud',
+                           box('Word Cloud', width = NULL)
+                           ),
+                  tabPanel('common_adjectives',
+                           box('Common Adjectives'), width = NULL
+                           ),
+                  tabPanel('adjectives_rank',
+                           box('Adjectives Rank'), width = NULL
+                           ),
+                  tabPanel('characteristics_rank',
+                           box('Characteristics Rank'), width = NULL
+                           )
+                  )
+                )
+              )
     )
   )
 ))

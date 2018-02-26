@@ -9,6 +9,7 @@ shinyServer(function(input, output){
     filtered_model_list = sapply(input$racquet_manufacturer, 
                                  function(string) 
                                    unname(models_by_manufacturer[string]))
+    
     selectizeInput(
       'racquet_model',
       'Tester Racquet Model(s)',
@@ -26,7 +27,7 @@ shinyServer(function(input, output){
   get_string_data_filtered = reactive({
     # Filter based on string criteria
     # create string_data_filtered and filter by string_minimum_reviews
-    string_data_filtered = string_data1 %>%
+    string_data_filtered = string_data_criteria %>%
       filter(num_ratings >= input$string_minimum_reviews)
     
     # string_price
@@ -326,8 +327,14 @@ shinyServer(function(input, output){
     return(string_data_filtered)
   })
   
+  ## table_title
+  # Produce text above data table using data from string_data_filtered()
+  output$table_title <- renderText({
+    paste0(nrow(get_string_data_filtered()), ' reviews meet your criteria:')
+  })
+  
   ## criteria_table
-  # Produce data table using filtered data from string_data_filtered()
+  # Produce data table using data from string_data_filtered()
   output$criteria_table = DT::renderDataTable({
     # paste all the vectors of strings into single strings for display
     string_data_filtered = get_string_data_filtered()
@@ -531,7 +538,6 @@ shinyServer(function(input, output){
                                  fixedColumns = TRUE, autoWidth = TRUE)))
        }
     
-
     # 
     #%>%
       #columnDefs = list(list(width = '200px', targets= c(7,8)))) %>%

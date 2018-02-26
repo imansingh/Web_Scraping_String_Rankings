@@ -16,6 +16,9 @@ library(DT)
 # Price: price_adjusted
 # Review Adjectives: review_adjectives_split
 
+# Overall Missingness:
+sapply(string_data, function(vec) sum(is.na(vec)))
+
 vec = c('Midsize ( >93 in\u00B2, >593 cm\u00B2 )',
         'MidPlus ( 93-105 in\u00B2, 594-677 cm\u00B2 )',
         'Oversize ( >106 in\u00B2, >678 cm\u00B2 )',
@@ -333,34 +336,41 @@ racquet_specs = substr(racquet_info_full, last_paren_indexes+1,
 
 # Extract racquet_manufacturer and racquet_model from racquet_names
 # Manufacturer is usually first word in racquet_names, with exceptions specified
+racquet_names_split[39]
 racquet_names_split = strsplit(racquet_names, ' ')
 get_manufacturer = function(vector){
+  if(!(is.na(vector[1]))){  
     if(vector[1] == 'Pro' | vector[1] == "Pro's" | vector[1] == 'The' | 
        vector[1] == 'Boris'){
       return(paste(vector[1:2], collapse = ' '))
-    }
-    else{
+    } else{
       return(vector[1])
     }
-}
-get_model = function(vector){
-  if(vector[1] == 'Pro' | vector[1] == "Pro's" | vector[1] == 'The' | 
-     vector[1] == 'Boris'){
-    return(paste(vector[-1:-2], collapse = ' '))
   }
-  else{
+}
+
+get_model = function(vector){
+  if(!(is.na(vector[1]))){  
+    if(vector[1] == 'Pro' | vector[1] == "Pro's" | vector[1] == 'The' | 
+       vector[1] == 'Boris'){
+      return(paste(vector[-1:-2], collapse = ' '))
+    } else {
     return(paste(vector[-1], collapse = ' '))
+    }
   }
 }
 
 #function to convert empty string to NA, to identify missing values
 empty_to_na = function(string){
-  if(string == ''){
+  if(is.null(string)){
+    string = NA
+  } else if(string == ''){
     string = NA
   }
   return(string)
 }
-
+racquet_names_split[4]
+racquet_manufacturer_raw[4]
 # create raw vectors with racquet_manufacturer and racquet_model
 racquet_manufacturer_raw = sapply(racquet_names_split, get_manufacturer)
 racquet_model_raw = sapply(racquet_names_split, get_model)
@@ -528,7 +538,7 @@ get_metric_gauge = function(vector){
 get_us_gauge = function(vector){
   gauge_string = paste(vector, collapse = '')
   if(gauge_string == '15L'){
-    string = 15
+    gauge_string = 15
   } else if(gauge_string == '16L'){
       gauge_string = 16
     } else if(gauge_string == '17L'){
@@ -643,6 +653,16 @@ string_data1 = mutate(string_data,
                       'string_adjectives' = review_adjectives_split)
 
 
+string_data_criteria = string_data1 %>%
+  select(string_name, num_ratings, price_adjusted, 
+         string_material, string_construction, string_features, 
+         string_gauge_metric, string_gauge_us, string_adjectives,
+         tester_reviews, tester_gender, tester_age, tester_level, 
+         tester_playstyle, tester_strokes, tester_spin, 
+         racquet_manufacturer, racquet_model, string_pattern, frame_size,
+         main_tension, cross_tension)
+
+names(string_data1)
 
 #creating grouped dataframes
 string_grouped = stringforum %>% group_by(string_name)

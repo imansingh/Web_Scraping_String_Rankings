@@ -7,7 +7,7 @@ library(shinydashboard)
 library(DT)
 library(data.table)
 
-# string_data <- fread("./stringforum.csv")
+ string_data <- fread("./stringforum.csv")
 
 # string_data <- read.csv(file = "./stringforum.csv")
 
@@ -60,8 +60,6 @@ get_adjective_pct = function(string_list, str_to_match){
            function(string_vec) grepl(str_to_match, string_vec)),
     function(logical_vec) sum(logical_vec)/length(logical_vec))
 }
-
-
 
 #creating grouped dataframes by string_name, tester_racquet and tester_name
 string_grouped = string_data %>% group_by(string_name)
