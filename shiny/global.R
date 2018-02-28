@@ -6,8 +6,11 @@ library(shiny)
 library(shinydashboard)
 library(DT)
 library(data.table)
+library(tm)
+library(wordcloud)
+library(memoise)
 
- string_data <- fread("./stringforum.csv")
+string_data <- fread("./stringforum.csv")
 
 # string_data <- read.csv(file = "./stringforum.csv")
 
@@ -61,10 +64,7 @@ get_adjective_pct = function(string_list, str_to_match){
     function(logical_vec) sum(logical_vec)/length(logical_vec))
 }
 
-#creating grouped dataframes by string_name, tester_racquet and tester_name
-string_grouped = string_data %>% group_by(string_name)
-racquet_grouped = string_data %>% group_by(tester_racquet)
-tester_grouped = string_data %>% group_by(tester_name)
+
 
 # #creating dataframes with mean values per group
 # string_means = string_grouped %>% summarise(reviews = n(), comfort = mean(comfort, na.rm=TRUE), control = mean(control, na.rm=TRUE), durability = mean(durability, na.rm=TRUE), feel = mean(feel, na.rm=TRUE), power = mean(power, na.rm=TRUE), spin = mean(spin, na.rm=TRUE), tension_stab = mean(tension_stability, na.rm=TRUE), satisfaction = mean(tester_satisfaction, na.rm=TRUE))

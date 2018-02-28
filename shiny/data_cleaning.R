@@ -336,7 +336,6 @@ racquet_specs = substr(racquet_info_full, last_paren_indexes+1,
 
 # Extract racquet_manufacturer and racquet_model from racquet_names
 # Manufacturer is usually first word in racquet_names, with exceptions specified
-racquet_names_split[39]
 racquet_names_split = strsplit(racquet_names, ' ')
 get_manufacturer = function(vector){
   if(!(is.na(vector[1]))){  
@@ -369,8 +368,7 @@ empty_to_na = function(string){
   }
   return(string)
 }
-racquet_names_split[4]
-racquet_manufacturer_raw[4]
+
 # create raw vectors with racquet_manufacturer and racquet_model
 racquet_manufacturer_raw = sapply(racquet_names_split, get_manufacturer)
 racquet_model_raw = sapply(racquet_names_split, get_model)
@@ -657,10 +655,14 @@ string_data_criteria = string_data1 %>%
   select(string_name, num_ratings, price_adjusted, 
          string_material, string_construction, string_features, 
          string_gauge_metric, string_gauge_us, string_adjectives,
-         tester_reviews, tester_gender, tester_age, tester_level, 
+         tester_name, tester_reviews, tester_gender, tester_age, tester_level, 
          tester_playstyle, tester_strokes, tester_spin, 
          racquet_manufacturer, racquet_model, string_pattern, frame_size,
-         main_tension, cross_tension)
+         main_tension, cross_tension,
+         comfort, control, durability, feel, power, spin, tension_stability, 
+         tester_satisfaction, review_text)
+
+
 
 names(string_data1)
 

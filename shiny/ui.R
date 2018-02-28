@@ -29,12 +29,10 @@ shinyUI(dashboardPage(
     tabItems(
       tabItem(tabName = 'criteria', 
               h2('Filter Which String Reviews are Fed Into String Selector'),
-              fluidRow(column(width = 12, style = 'padding:15px',
-                              h3('Select your String Criteria, Tester Criteria, 
-                                 and Tester Racquet Criteria:'),
-                              h4('The table below will update based on your 
-                                 choices')
-                              )
+              fluidRow(style = 'padding:15px',
+                       h3('Select your String Criteria, Tester Criteria, and 
+                          Tester Racquet Criteria:'),
+                       h4('The table below will update based on your choices')
                        ),
               fluidRow(
                 tabBox(
@@ -458,17 +456,16 @@ shinyUI(dashboardPage(
                            )
                   )
                 ),
-              #fluidRow(column(width = 12, style = 'padding:15px',
-              fluidRow(h3(style = 'padding:15px', textOutput('table_title'))),
+              fluidRow(style = 'padding:15px',
+                       h3(textOutput('criteria_table_title'))),
               fluidRow(box(DT::dataTableOutput('criteria_table'), width = 12))
               ),
       tabItem(tabName = "selector",
               h2('Find the Right String Using Data Filtered by Search Criteria'),
-              fluidRow(column(width = 12, style = 'padding:15px',
-                              h3('Select your preferred String Characteristics 
-                                 and String Adjectives:'),
-                              h4('The table below will update based on your 
-                                 choices'))
+              fluidRow(style = 'padding:15px',
+                       h3('Select your preferred String Characteristics and 
+                          String Adjectives:'),
+                       h4('The table below will update based on your choices')
                        ),
               fluidRow(tabBox(
                   id = 'selectorInput',
@@ -593,7 +590,13 @@ shinyUI(dashboardPage(
                              )
                            )
                   )),
-              fluidRow(h3('Table Options')),
+              fluidRow(style = 'padding:15px', 
+                       h3('Select your preferred String Characteristics and String Adjectives:'),
+                       h4('The table below will update based on your choices')
+                       ),
+              fluidRow(style = 'padding:15px',
+                       h3('Table Options')
+                       ),
               fluidRow(box(radioButtons('table_choice',
                            'Do you want to rank strings based on
                            String Characteristics, String Adjectives, or Both?',
@@ -622,17 +625,18 @@ shinyUI(dashboardPage(
                                                 width = 6)
                                             )
                            ),
-                width=8)),
-              fluidRow(h3('[insert count] strings meet your criteria')),
+                width=6)),
+              fluidRow(style = 'padding:15px',
+                       h3(textOutput('selector_table_title'))),
               fluidRow(box(DT::dataTableOutput("selector_table"), width = 12))
               ),
       tabItem(tabName = "string_profile",
               h2('Find out Information about Selected String'),
-              fluidRow(column(width = 12, style = 'padding:15px',
-                              h3('Select a string:'),
-                              h4('The information below will update based on your 
-                                 choice'))
-                              ),
+              fluidRow(style = 'padding:15px',
+                       h3('Select a string:'),
+                       h4('The information below will update based on your 
+                          choice')
+                       ),
               fluidRow(
                 box(selectizeInput(
                   'string_selected', 
@@ -652,7 +656,20 @@ shinyUI(dashboardPage(
                                width = NULL)
                            ),
                   tabPanel('word_cloud',
-                           box('Word Cloud', width = NULL)
+                           box(width = 12,
+                             column(width = 4,
+                                    sliderInput("freq",
+                                                "Minimum Frequency:",
+                                                min = 1,  max = 50, value = 15),
+                                    sliderInput("max",
+                                                "Maximum Number of Words Displayed:",
+                                                min = 1,  max = 300,  value = 100)
+                                    ),
+                             column(width = 8,
+                                    box(plotOutput("wordcloud"),
+                                        width = NULL)
+                                    )
+                             )
                            ),
                   tabPanel('common_adjectives',
                            box('Common Adjectives'), width = NULL
