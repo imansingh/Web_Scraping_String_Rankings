@@ -434,7 +434,7 @@ shinyUI(dashboardPage(
                                width = 4),
                              box(sliderInput(
                                'main_tension', 
-                               'Tension - Main Strings', 
+                               'Tension - Main Strings (lbs)', 
                                min = 35, max = 75, value = c(35,75),
                                round = TRUE),
                                checkboxInput('main_missing', 
@@ -444,7 +444,7 @@ shinyUI(dashboardPage(
                                width = 4),
                              box(sliderInput(
                                'cross_tension', 
-                               'Tension - Cross Strings', 
+                               'Tension - Cross Strings (lbs)', 
                                min = 35, max = 75, value = c(35,75),
                                round = TRUE),
                                checkboxInput('cross_missing', 
@@ -631,32 +631,27 @@ shinyUI(dashboardPage(
               fluidRow(box(DT::dataTableOutput("selector_table"), width = 12))
               ),
       tabItem(tabName = "string_profile",
-              h2('Find out Information about Selected String'),
+              h2('Find out Information about a Specific String'),
               fluidRow(style = 'padding:15px',
                        h3('Select a string:'),
                        h4('The information below will update based on your 
                           choice')
                        ),
               fluidRow(
-                box(selectizeInput(
-                  'string_selected', 
-                  'Select String', 
-                  choices = sort(string_data1$string_name),
-                  options = list(placeholder = 
-                                   '(type part of the name)')),
+                box(uiOutput('filtered_strings'),
                   width = 4)
                 ),
               fluidRow(
                 tabBox(
                   id = 'string_profile_output',
                   width = 12,
-                  selected = 'string_reviews',
-                  tabPanel('string_reviews',
+                  selected = 'All Reviews',
+                  tabPanel('All Reviews',
                            box(DT::dataTableOutput("review_table"), 
                                width = NULL)
                            ),
-                  tabPanel('word_cloud',
-                           box(width = 12,
+                  tabPanel('Review Word Cloud',
+                           box(width = NULL,
                              column(width = 4,
                                     sliderInput("freq",
                                                 "Minimum Frequency:",
@@ -671,14 +666,20 @@ shinyUI(dashboardPage(
                                     )
                              )
                            ),
-                  tabPanel('common_adjectives',
-                           box('Common Adjectives'), width = NULL
+                  tabPanel('Characteristics Analysis',
+                           box('Characteristics Analysis', 
+                               width = NULL)
                            ),
-                  tabPanel('adjectives_rank',
-                           box('Adjectives Rank'), width = NULL
+                  tabPanel('Characteristics Plot',
+                           box('Characteristics Plot'), width = NULL
                            ),
-                  tabPanel('characteristics_rank',
-                           box('Characteristics Rank'), width = NULL
+                  tabPanel('Adjectives Analysis',
+                           box(#DT::dataTableOutput(
+                             'adjectives_analysis_table'), 
+                               width = NULL
+                           ),
+                  tabPanel('Adjectives Plot',
+                           box('Adjectives Plot'), width = NULL
                            )
                   )
                 )

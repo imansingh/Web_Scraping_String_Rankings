@@ -53,6 +53,18 @@ get_checkbox_items_list = function(string){
 #       string_data1$racquet_manufacturer == manufacturer]))
 # }
 
+adjectives_list = c('soft', 'comfortable', 'flexible', 'precise',
+                   'resilient', 'explosive', 'innovative', 'unique',
+                   'spongy', 'stiff', 'dull', 'lively', 'stretchy',
+                   'crispy', 'boring', 'elastic', 'solid', 'rough',
+                   'wire_like', 'springy', 'sluggish', 'outdated')
+
+clrs <- c(
+  round(seq(40, 255, length.out = 10), 0) %>%
+  {paste0("rgb(255,", ., ",", ., ")")},
+  round(seq(255, 40, length.out = 10), 0) %>%
+  {paste0("rgb(", ., ",255,", ., ")")}
+)
 
 ## get_adjective_pct
 # create vec that gives percentage of of strings in vec that match
@@ -61,7 +73,7 @@ get_adjective_pct = function(string_list, str_to_match){
   sapply( # this takes list of logical vectors and divides sum/length to get pct
     sapply(string_list[!(is.na(string_list))],  # this returns list of logical vectors
            function(string_vec) grepl(str_to_match, string_vec)),
-    function(logical_vec) sum(logical_vec)/length(logical_vec))
+    function(logical_vec) round(sum(logical_vec)/length(logical_vec) * 100, 1))
 }
 
 

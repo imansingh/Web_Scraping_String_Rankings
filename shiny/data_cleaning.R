@@ -442,9 +442,9 @@ string_info_split = strsplit(string_info_full, ', ')
 # functions to extract string_material, string_construction and string_features
 get_string_material = function(vector){
   material = vector[vector == 'Aramid' | vector == 'Polyester' | 
-                             vector == 'Polyamid' | vector == 'Polyethylene' |
-                             vector == 'Polyurethane' | vector == 'Zyex' |
-                             vector == 'Natural Gut']
+                      vector == 'Co-Polyester' | vector == 'Polyamid' | 
+                      vector == 'Polyethylene' | vector == 'Polyurethane' | 
+                      vector == 'Zyex' | vector == 'Natural Gut']
   return(material)
 }
 get_string_construction = function(vector){
@@ -605,8 +605,14 @@ price_adjusted = sapply(price_split, get_prices)
 # Review Adjectives: review_adjectives_split
 ##Extract list of review_adjectives vectors
 review_adjectives_full = as.character(string_data$review_adjectives)
+
+# replace 'wire-like' with 'wire_like' to avoid issues with hyphen in column name
+review_adjectives_full = gsub('wire-like', 'wire_like', review_adjectives_full)
+
 review_adjectives_split = sapply(strsplit(review_adjectives_full, ', '), 
                                  char0_to_na)  #replaces 'character(0)' with NA
+
+
 
 # ## Capitalize All Strings
 # 
@@ -626,6 +632,21 @@ review_adjectives_split = sapply(strsplit(review_adjectives_full, ', '),
 # # create vecs with capitalized strings strings
 # tester_gender = unname(sapply(tester_gender, simpleCap))
 # string_adjectives = sapply(review_adjectives_split, simpleCap_list)
+
+
+# for characteristics scores,  add 3 and multiply by .06 to get interpretable 
+# score on 0-100 range because characteristics are measured on -3 to +3 scale
+string_data = string_data %>%
+  mutate(
+    comfort = (comfort + 3) / .06,
+    control = (control + 3) / .06,
+    durability = (durability + 3) / .06,
+    feel = (feel + 3) / .06,
+    power = (power +3) / .06,
+    spin = (spin + 3) / .06,
+    tension_stability = (tension_stability + 3) / .06,
+    tester_satisfaction = (tester_satisfaction + 3) / .06
+  )
 
 
 ## Update dataframe with new columns containing extracted data
