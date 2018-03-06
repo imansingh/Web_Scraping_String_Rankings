@@ -10,7 +10,7 @@ library(tm)
 library(wordcloud)
 library(memoise)
 
-string_data <- fread("./stringforum.csv")
+# string_data <- fread("./stringforum.csv")
 
 # string_data <- read.csv(file = "./stringforum.csv")
 
@@ -58,6 +58,13 @@ adjectives_list = c('soft', 'comfortable', 'flexible', 'precise',
                    'spongy', 'stiff', 'dull', 'lively', 'stretchy',
                    'crispy', 'boring', 'elastic', 'solid', 'rough',
                    'wire_like', 'springy', 'sluggish', 'outdated')
+
+characteristics_list = c('comfort', 'control', 'durability', 'feel', 'power', 
+                         'spin', 'tension_stability', 'overall_satisfaction')
+
+brks_percentile = seq(5,95,5)
+brks_z = qnorm(seq(.05,.95,.05))
+
 
 clrs <- c(
   round(seq(40, 255, length.out = 10), 0) %>%

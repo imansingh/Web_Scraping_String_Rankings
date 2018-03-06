@@ -499,7 +499,7 @@ shinyUI(dashboardPage(
                                              'Tension Stability',
                                              min = 0, max = 10, value = 5),
                                  width = 3),
-                             box(sliderInput('string_tester_satisfaction',
+                             box(sliderInput('string_overall_satisfaction',
                                              'Overall User Satisfaction',
                                              min = 0, max = 10, value = 5),
                                  width = 3)
@@ -667,16 +667,40 @@ shinyUI(dashboardPage(
                              )
                            ),
                   tabPanel('Characteristics Analysis',
-                           box('Characteristics Analysis', 
+                           box(DT::dataTableOutput('characteristics_analysis_table'), 
                                width = NULL)
                            ),
                   tabPanel('Characteristics Plot',
-                           box('Characteristics Plot'), width = NULL
+                           h3('Select Characteristics to Plot'),
+                           fluidRow(
+                             column(width = 6,
+                                    box(selectizeInput(
+                                      'x_var_char',
+                                      'X Variable (independent)', 
+                                      choices = characteristics_list,
+                                      multiple = FALSE,
+                                      options = list(placeholder = 
+                                                       '(choose x variable)')))),
+                             ccolumn(width = 6,
+                                     box(selectizeInput(
+                                       'y_var_char',
+                                       'Y Variable (dependent)', 
+                                       choices = characteristics_list,
+                                       multiple = FALSE,
+                                       options = list(placeholder = 
+                                                        '(choose y variable)'))))
                            ),
+                           fluidRow(
+                             column(width = 6, 
+                                    box(DT::dataTableOutput('characteristics_plot_table'), 
+                                        width = NULL)),
+                             column(6, box(plotOutput('x2', height = 500), 
+                                           width = NULL))
+                             )
+                           )
                   tabPanel('Adjectives Analysis',
-                           box(#DT::dataTableOutput(
-                             'adjectives_analysis_table'), 
-                               width = NULL
+                           box(DT::dataTableOutput('adjectives_analysis_table'), 
+                               width = NULL)
                            ),
                   tabPanel('Adjectives Plot',
                            box('Adjectives Plot'), width = NULL

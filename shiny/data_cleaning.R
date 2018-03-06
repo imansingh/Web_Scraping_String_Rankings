@@ -636,7 +636,12 @@ review_adjectives_split = sapply(strsplit(review_adjectives_full, ', '),
 
 # for characteristics scores,  add 3 and multiply by .06 to get interpretable 
 # score on 0-100 range because characteristics are measured on -3 to +3 scale
-string_data = string_data %>%
+
+# convert characteristics scores to % max
+# all NAs are preserved
+
+
+string_data1 = string_data %>%
   mutate(
     comfort = (comfort + 3) / .06,
     control = (control + 3) / .06,
@@ -645,12 +650,12 @@ string_data = string_data %>%
     power = (power +3) / .06,
     spin = (spin + 3) / .06,
     tension_stability = (tension_stability + 3) / .06,
-    tester_satisfaction = (tester_satisfaction + 3) / .06
+    tester_satisfaction = (tester_satisfaction + 1) / .02
   )
 
 
 ## Update dataframe with new columns containing extracted data
-string_data1 = mutate(string_data, 
+string_data1 = mutate(string_data1, 
                       'tester_gender' = tester_gender,
                       'tester_age' = tester_age,
                       'tester_level' = tester_level,
@@ -681,9 +686,9 @@ string_data_criteria = string_data1 %>%
          racquet_manufacturer, racquet_model, string_pattern, frame_size,
          main_tension, cross_tension,
          comfort, control, durability, feel, power, spin, tension_stability, 
-         tester_satisfaction, review_text)
+         overall_satisfaction = tester_satisfaction, review_text)
 
-
+write.csv(string_data1)
 
 names(string_data1)
 
