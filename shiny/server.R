@@ -1199,35 +1199,39 @@ shinyServer(function(input, output){
                   backgroundColor = styleInterval(brks_z, clrs))
   })
   
-  # two columns of the mtcars data
-  mtcars2 = mtcars[, c('hp', 'mpg')]
+  # reactive dataframe for characteristics plot
+  get_characteristics_plot_df = reactive({
+    get_string_data_filtered()[, c(input$x_var_char, input$y_var_char)]
+  })
   
-  # render the table (with row names)
+  # render the characteristics table (with row names)
   output$characteristics_plot_table = DT::renderDataTable({
+    
+    datatable(get_characteristics_plot_df())
     
     })
   
   # a scatterplot with certain points highlighted
-  output$x2 = renderPlot({
+  output$characteristics_plot = renderPlot({
     
-    s1 = input$x1_rows_current  # rows on the current page
-    s2 = input$x1_rows_all      # rows on all pages (after being filtered)
+    s1 = input$characteristics_plot_table_rows_current  # rows on the current page
+    s2 = input$characteristics_plot_table_rows_all      # rows on all pages (after being filtered)
     
     par(mar = c(4, 4, 1, .1))
-    plot(mtcars2, pch = 21)
+    plot(get_characteristics_plot_df(), pch = 21)
     
     # solid dots (pch = 19) for current page
     if (length(s1)) {
-      points(mtcars2[s1, , drop = FALSE], pch = 19, cex = 2)
+      points(get_characteristics_plot_df()[s1, , drop = FALSE], pch = 19, cex = 2)
     }
     
     # show red circles when performing searching
-    if (length(s2) > 0 && length(s2) < nrow(mtcars2)) {
-      points(mtcars2[s2, , drop = FALSE], pch = 21, cex = 3, col = 'red')
+    if (length(s2) > 0 && length(s2) < nrow(get_characteristics_plot_df())) {
+      points(get_characteristics_plot_df()[s2, , drop = FALSE], pch = 21, cex = 3, col = 'red')
     }
     
     # dynamically change the legend text
-    s = input$x1_search
+    s = input$characteristics_plot_table_search
     txt = if (is.null(s) || s == '') 'Filtered data' else {
       sprintf('Data matching "%s"', s)
     }
