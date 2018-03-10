@@ -1,0 +1,12 @@
+name: tennis_string_finder
+title: Tennis String Finder
+username:
+account: imansingh
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 296363
+bundleId: 1260456
+url: https://imansingh.shinyapps.io/tennis_string_finder/
+when: 1520568035.91524
+asMultiple: FALSE
+asStatic: FALSE

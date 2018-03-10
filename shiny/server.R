@@ -342,7 +342,7 @@ shinyServer(function(input, output){
   
   ## criteria_table_title
   # Produce text above criteria table using data from string_data_filtered()
-  output$criteria_table_title <- renderText({
+  output$criteria_table_title = renderText({
     paste0(nrow(get_string_data_filtered()), ' reviews meet your criteria:')
   })
   
@@ -395,9 +395,9 @@ shinyServer(function(input, output){
   
   ## selector_table_title
   # Produce text above selector table using data from string_data_filtered()
-  output$selector_table_title <- renderText({
+  output$selector_table_title = renderText({
     paste0(length(unique(get_string_data_filtered()$string_name)),
-           ' reviews meet your criteria:')
+           ' strings meet your criteria:')
   })
   
   ## selector_table
@@ -572,7 +572,7 @@ shinyServer(function(input, output){
                              probs = seq(.05, .95, .05), 
                              na.rm = TRUE)
   
-     brks_durability <- quantile(selector_table_characteristics$durability, 
+     brks_durability = quantile(selector_table_characteristics$durability, 
                                  probs = seq(.05, .95, .05), 
                                  na.rm = TRUE)
      
@@ -588,15 +588,15 @@ shinyServer(function(input, output){
                           probs = seq(.05, .95, .05), 
                           na.rm = TRUE)
      
-     brks_tension <- quantile(selector_table_characteristics$tension_stab, 
+     brks_tension = quantile(selector_table_characteristics$tension_stab, 
                               probs = seq(.05, .95, .05), 
                               na.rm = TRUE)
      
-     brks_satisfaction <- quantile(selector_table_characteristics$satisfaction, 
+     brks_satisfaction = quantile(selector_table_characteristics$satisfaction, 
                                    probs = seq(.05, .95, .05), 
                                    na.rm = TRUE)
      
-     brks_characteristics <- quantile(selector_table_characteristics$
+     brks_characteristics = quantile(selector_table_characteristics$
                                         characteristics_score, 
                               probs = seq(.05, .95, .05), 
                               na.rm = TRUE)
@@ -689,7 +689,7 @@ shinyServer(function(input, output){
                            probs = seq(.05, .95, .05), 
                            na.rm = TRUE)
      
-     brks_adjectives <- quantile(selector_table_adjectives$adjectives_score, 
+     brks_adjectives = quantile(selector_table_adjectives$adjectives_score, 
                                       probs = seq(.05, .95, .05), 
                                       na.rm = TRUE)
      
@@ -808,14 +808,14 @@ shinyServer(function(input, output){
        datatable(selector_table_both, rownames=TRUE,
                  colnames = c('string name', '# reviews (ch)','comfort', 
                               'control', 'durability', 'feel',
-                              'power', 'spin', 'tension_stab', 
-                              'satisfaction', 'characteristics_score', 
+                              'power', 'spin', 'tension stab', 
+                              'satisfaction', 'characteristics score', 
                               '# reviews (adj)',
                               'soft', 'comfortable', 'flexible', 'precise', 
                               'resilient', 'explosive', 'innovative', 'unique', 
                               'spongy', 'stiff', 'dull', 'lively', 'stretchy', 
                               'crispy', 'boring', 'elastic', 'solid', 'rough', 
-                              'wire_like', 'springy', 'sluggish', 'outdated', 
+                              'wire-like', 'springy', 'sluggish', 'outdated', 
                               'adjectives score', 'combined score'),
                  #extensions = list('ColReorder'), #, 'FixedColumns', 'Responsive'),
                  options = (list(scrollX = TRUE, scrollY=TRUE, #colReorder = TRUE,
@@ -999,7 +999,7 @@ shinyServer(function(input, output){
       myCorpus = tm_map(myCorpus, removeWords,
                         c(stopwords("SMART"), "the", "and", "but", 'string', 
                           'strings', 'hour', 'hours', 'day', 'days', 'time',
-                          'dont', 'didnt', 'player', 'played', 'tennis', 
+                          'dont', 'didnt', 'play','player', 'played', 'tennis',
                           'court', 'ball', 'shot', 'shots', 'test', 'tested'))
       
       myDTM = TermDocumentMatrix(myCorpus,
@@ -1022,7 +1022,7 @@ shinyServer(function(input, output){
   
   output$wordcloud = renderPlot({
     req(input$string_selected)
-    v <- terms()
+    v = terms()
     wordcloud_rep(names(v), v, scale=c(4,0.5),
                   min.freq = input$freq, max.words=input$max,
                   colors = brewer.pal(8, "Dark2"))
@@ -1154,15 +1154,15 @@ shinyServer(function(input, output){
     characteristics_analysis_df = 
       data.frame(characteristics_list,
                  characteristics_string_means = 
-                   round(characteristics_string_means / 100, 1),
+                   round(characteristics_string_means, 1),
                  characteristics_sample_means =
-                   round(characteristics_sample_means / 100, 1),
+                   round(characteristics_sample_means, 1),
                                     characteristics_sample_percentile =
                                       round(characteristics_sample_percentile, 1),
                                     characteristics_sample_z =
                                       round(characteristics_sample_z, 2),
                                     characteristics_full_means =
-                                      round(characteristics_full_means / 100, 1),
+                                      round(characteristics_full_means, 1),
                                     characteristics_full_percentile =
                                       round(characteristics_full_percentile, 1),
                                     characteristics_full_z =
@@ -1199,51 +1199,51 @@ shinyServer(function(input, output){
                   backgroundColor = styleInterval(brks_z, clrs))
   })
   
-  # reactive dataframe for characteristics plot
-  get_characteristics_plot_df = reactive({
-    get_string_data_filtered()[, c(input$x_var_char, input$y_var_char)]
-  })
-  
-  # render the characteristics table (with row names)
-  output$characteristics_plot_table = DT::renderDataTable({
-    
-    datatable(get_characteristics_plot_df())
-    
-    })
-  
-  # a scatterplot with certain points highlighted
-  output$characteristics_plot = renderPlot({
-    
-    s1 = input$characteristics_plot_table_rows_current  # rows on the current page
-    s2 = input$characteristics_plot_table_rows_all      # rows on all pages (after being filtered)
-    
-    par(mar = c(4, 4, 1, .1))
-    plot(get_characteristics_plot_df(), pch = 21)
-    
-    # solid dots (pch = 19) for current page
-    if (length(s1)) {
-      points(get_characteristics_plot_df()[s1, , drop = FALSE], pch = 19, cex = 2)
-    }
-    
-    # show red circles when performing searching
-    if (length(s2) > 0 && length(s2) < nrow(get_characteristics_plot_df())) {
-      points(get_characteristics_plot_df()[s2, , drop = FALSE], pch = 21, cex = 3, col = 'red')
-    }
-    
-    # dynamically change the legend text
-    s = input$characteristics_plot_table_search
-    txt = if (is.null(s) || s == '') 'Filtered data' else {
-      sprintf('Data matching "%s"', s)
-    }
-    
-    legend(
-      'topright', c('Original data', 'Data on current page', txt),
-      pch = c(21, 19, 21), pt.cex = c(1, 2, 3), col = c(1, 1, 2),
-      y.intersp = 2, bty = 'n'
-    )
-    
-  })
-  
+  # # reactive dataframe for characteristics plot
+  # get_characteristics_plot_df = reactive({
+  #   get_string_data_filtered()[, c(input$x_var_char, input$y_var_char)]
+  # })
+  # 
+  # # render the characteristics table (with row names)
+  # output$characteristics_plot_table = DT::renderDataTable({
+  #   
+  #   datatable(get_characteristics_plot_df())
+  #   
+  #   })
+  # 
+  # # a scatterplot with certain points highlighted
+  # output$characteristics_plot = renderPlot({
+  #   
+  #   s1 = input$characteristics_plot_table_rows_current  # rows on the current page
+  #   s2 = input$characteristics_plot_table_rows_all      # rows on all pages (after being filtered)
+  #   
+  #   par(mar = c(4, 4, 1, .1))
+  #   plot(get_characteristics_plot_df(), pch = 21)
+  #   
+  #   # solid dots (pch = 19) for current page
+  #   if (length(s1)) {
+  #     points(get_characteristics_plot_df()[s1, , drop = FALSE], pch = 19, cex = 2)
+  #   }
+  #   
+  #   # show red circles when performing searching
+  #   if (length(s2) > 0 && length(s2) < nrow(get_characteristics_plot_df())) {
+  #     points(get_characteristics_plot_df()[s2, , drop = FALSE], pch = 21, cex = 3, col = 'red')
+  #   }
+  #   
+  #   # dynamically change the legend text
+  #   s = input$characteristics_plot_table_search
+  #   txt = if (is.null(s) || s == '') 'Filtered data' else {
+  #     sprintf('Data matching "%s"', s)
+  #   }
+  #   
+  #   legend(
+  #     'topright', c('Original data', 'Data on current page', txt),
+  #     pch = c(21, 19, 21), pt.cex = c(1, 2, 3), col = c(1, 1, 2),
+  #     y.intersp = 2, bty = 'n'
+  #   )
+  #   
+  # })
+  # 
   output$adjectives_analysis_table = DT::renderDataTable({
     req(input$string_selected)
     

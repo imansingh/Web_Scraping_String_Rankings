@@ -2,21 +2,22 @@ shinyUI(dashboardPage(
   dashboardHeader(title = "Stringforum Project"),
   dashboardSidebar(
     sidebarUserPanel('Iman Singh',
-                     subtitle = 'NYC Data Science Academy',
                      image = 'imansingh_headshot.jpg'
                      ),
     sidebarMenu(
-      menuItem('Search Criteria', tabName = 'criteria', 
-               icon = icon('map')
+      menuItem('Review Criteria', tabName = 'criteria', 
+               icon = icon('filter')
                ),
-      menuItem('String Selector', tabName = 'selector', 
-               icon = icon('bar-chart')
+      menuItem('String Rankings', tabName = 'selector', 
+               icon = icon('sort')
                ),
       menuItem('String Profiles', tabName = 'string_profile', 
-               icon = icon('line-chart')
+               icon = icon('info-circle')
                ),
       br(),
-      menuItem('Contact Iman Singh'),
+      br(),
+      br(),
+      menuItem('Contact Iman:'),
       menuItem('LinkedIn', icon = icon('linkedin-square'), 
                href = 'https://www.linkedin.com/in/imansingh/'
                ),
@@ -28,9 +29,9 @@ shinyUI(dashboardPage(
   dashboardBody(
     tabItems(
       tabItem(tabName = 'criteria', 
-              h2('Filter Which String Reviews are Fed Into String Selector'),
+              h2('Filter Which Reviews are Used for String Rankings and Profiles'),
               fluidRow(style = 'padding:15px',
-                       h3('Select your String Criteria, Tester Criteria, and 
+                       h3('Select Your String Criteria, Tester Criteria, and 
                           Tester Racquet Criteria:'),
                        h4('The table below will update based on your choices')
                        ),
@@ -461,9 +462,9 @@ shinyUI(dashboardPage(
               fluidRow(box(DT::dataTableOutput('criteria_table'), width = 12))
               ),
       tabItem(tabName = "selector",
-              h2('Find the Right String Using Data Filtered by Search Criteria'),
+              h2('Find Top Ranked Strings from Filtered Reviews'),
               fluidRow(style = 'padding:15px',
-                       h3('Select your preferred String Characteristics and 
+                       h3('Select Weights for String Characteristics and/or 
                           String Adjectives:'),
                        h4('The table below will update based on your choices')
                        ),
@@ -590,10 +591,6 @@ shinyUI(dashboardPage(
                              )
                            )
                   )),
-              fluidRow(style = 'padding:15px', 
-                       h3('Select your preferred String Characteristics and String Adjectives:'),
-                       h4('The table below will update based on your choices')
-                       ),
               fluidRow(style = 'padding:15px',
                        h3('Table Options')
                        ),
@@ -631,7 +628,7 @@ shinyUI(dashboardPage(
               fluidRow(box(DT::dataTableOutput("selector_table"), width = 12))
               ),
       tabItem(tabName = "string_profile",
-              h2('Find out Information about a Specific String'),
+              h2('Get Review Information about a Specific String'),
               fluidRow(style = 'padding:15px',
                        h3('Select a string:'),
                        h4('The information below will update based on your 
@@ -645,8 +642,8 @@ shinyUI(dashboardPage(
                 tabBox(
                   id = 'string_profile_output',
                   width = 12,
-                  selected = 'All Reviews',
-                  tabPanel('All Reviews',
+                  selected = 'Read Reviews',
+                  tabPanel('Read Reviews',
                            box(DT::dataTableOutput("review_table"), 
                                width = NULL)
                            ),
