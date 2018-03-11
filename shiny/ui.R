@@ -17,13 +17,17 @@ shinyUI(dashboardPage(
       br(),
       br(),
       br(),
-      menuItem('Contact Iman:'),
+      menuItem('About Iman:'),
+      menuItem('Blog', icon = icon('wordpress'), 
+               href = 'https://nycdatascience.com/blog/author/imansingh/'
+               ),
       menuItem('LinkedIn', icon = icon('linkedin-square'), 
                href = 'https://www.linkedin.com/in/imansingh/'
                ),
       menuItem('GitHub', icon = icon('github'), 
                href = 'https://github.com/imansingh/Scraping-Project'
                )
+      
     )
   ),
   dashboardBody(
