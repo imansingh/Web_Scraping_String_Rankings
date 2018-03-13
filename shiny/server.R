@@ -39,7 +39,7 @@ shinyServer(function(input, output){
   get_string_data_filtered = reactive({
     # Filter based on string criteria
     # create string_data_filtered and filter by string_minimum_reviews
-    string_data_filtered = string_data_criteria %>%
+    string_data_filtered = string_data_wrangled %>%
       filter(num_ratings >= input$string_minimum_reviews)
     
     # string_price
@@ -63,7 +63,7 @@ shinyServer(function(input, output){
                               string_data_filtered$string_material))
       if('None Listed' %in% input$string_material){
         matrix = cbind(matrix, 
-                       is.na(string_data_filtered$string_material))
+                       string_data_filtered$string_material == '')
       }
       string_data_filtered = string_data_filtered[rowSums(matrix) > 0,]
     }
@@ -76,7 +76,7 @@ shinyServer(function(input, output){
                               string_data_filtered$string_construction))
       if('None Listed' %in% input$string_construction){
         matrix = cbind(matrix, 
-                       is.na(string_data_filtered$string_construction))
+                       string_data_filtered$string_construction == '')
       }
       string_data_filtered = string_data_filtered[rowSums(matrix) > 0,]
     }
@@ -89,7 +89,7 @@ shinyServer(function(input, output){
                               string_data_filtered$string_features))
       if('None Listed' %in% input$string_features){
         matrix = cbind(matrix, 
-                       is.na(string_data_filtered$string_features))
+                       string_data_filtered$string_features == '')
       }
       string_data_filtered = string_data_filtered[rowSums(matrix) > 0,]
     }
@@ -128,7 +128,7 @@ shinyServer(function(input, output){
                               string_data_filtered$string_adjectives))
       if(input$adjectives_positive_missing){
         matrix = cbind(matrix, 
-                       is.na(string_data_filtered$string_adjectives))
+                       string_data_filtered$string_adjectives == '')
       }
       string_data_filtered = string_data_filtered[rowSums(matrix) > 0,]
     }
@@ -141,7 +141,7 @@ shinyServer(function(input, output){
                               string_data_filtered$string_adjectives))
       if(!input$adjectives_negative_missing){
         matrix = cbind(matrix, 
-                       is.na(string_data_filtered$string_adjectives))
+                       string_data_filtered$string_adjectives == '')
       }
       string_data_filtered = string_data_filtered[rowSums(matrix) < 1,]
     }
@@ -351,28 +351,32 @@ shinyServer(function(input, output){
   # Produce data table using data from string_data_filtered()
   output$criteria_table = DT::renderDataTable({
     
-    # we don't need to display characteristics or review text since they are not
-    # options related to these in string criteria
+    # we don't need to display characteristics, adjectives or review text since 
+    # they are not options related to these in string criteria
     criteria_table_data = get_string_data_filtered() %>%
-      select(-comfort, -control, -durability, -feel, -power, -spin,
-             -tension_stability, -overall_satisfaction, -review_text)
+      select(string_name, num_ratings, price_adjusted, string_material, 
+             string_construction, string_features, string_gauge_metric,
+             string_gauge_us, string_adjectives, tester_name, tester_reviews,
+             tester_gender, tester_age, tester_level, tester_playstyle, 
+             tester_strokes, tester_spin, racquet_manufacturer, racquet_model,
+             string_pattern, frame_size, main_tension, cross_tension)
     
-    # paste all the vectors of strings into single strings for display
-    criteria_table_data$string_adjectives =
-      sapply(criteria_table_data$string_adjectives,
-             function(vec) paste(vec, collapse = ', '))
-
-    criteria_table_data$string_material =
-      sapply(criteria_table_data$string_material,
-             function(vec) paste(vec, collapse = ', '))
-
-    criteria_table_data$string_construction =
-      sapply(criteria_table_data$string_construction,
-             function(vec) paste(vec, collapse = ', '))
-
-    criteria_table_data$string_features =
-      sapply(criteria_table_data$string_features,
-             function(vec) paste(vec, collapse = ', '))
+    # # paste all the vectors of strings into single strings for display
+    # criteria_table_data$string_adjectives =
+    #   sapply(criteria_table_data$string_adjectives,
+    #          function(vec) paste(vec, collapse = ', '))
+    # 
+    # criteria_table_data$string_material =
+    #   sapply(criteria_table_data$string_material,
+    #          function(vec) paste(vec, collapse = ', '))
+    # 
+    # criteria_table_data$string_construction =
+    #   sapply(criteria_table_data$string_construction,
+    #          function(vec) paste(vec, collapse = ', '))
+    # 
+    # criteria_table_data$string_features =
+    #   sapply(criteria_table_data$string_features,
+    #          function(vec) paste(vec, collapse = ', '))
     
     # create datatable
     datatable(criteria_table_data, rownames = FALSE, 
@@ -441,7 +445,7 @@ shinyServer(function(input, output){
 
      selector_table_adjectives = get_string_data_filtered() %>%
        # remove reviews with no adjectives listed
-       filter(!(is.na(string_adjectives))) %>%
+       filter(!(string_adjectives == '')) %>%
        # for each review get percentage of adjectives listed matching adjective
        mutate(soft = get_adjective_pct(
          get_string_data_filtered()$string_adjectives, 'soft')) %>%
@@ -1067,14 +1071,14 @@ shinyServer(function(input, output){
       )
     
     characteristics_full_means = 
-      c(mean(string_data_criteria$comfort, na.rm = TRUE),
-        mean(string_data_criteria$control, na.rm = TRUE),
-        mean(string_data_criteria$durability, na.rm = TRUE),
-        mean(string_data_criteria$feel, na.rm = TRUE),
-        mean(string_data_criteria$power, na.rm = TRUE),
-        mean(string_data_criteria$spin, na.rm = TRUE),
-        mean(string_data_criteria$tension_stability, na.rm = TRUE),
-        mean(string_data_criteria$overall_satisfaction, na.rm = TRUE)
+      c(mean(string_data_wrangled$comfort, na.rm = TRUE),
+        mean(string_data_wrangled$control, na.rm = TRUE),
+        mean(string_data_wrangled$durability, na.rm = TRUE),
+        mean(string_data_wrangled$feel, na.rm = TRUE),
+        mean(string_data_wrangled$power, na.rm = TRUE),
+        mean(string_data_wrangled$spin, na.rm = TRUE),
+        mean(string_data_wrangled$tension_stability, na.rm = TRUE),
+        mean(string_data_wrangled$overall_satisfaction, na.rm = TRUE)
       )
 
     # characteristics_sample_percentile = c(
@@ -1088,14 +1092,14 @@ shinyServer(function(input, output){
     #   ecdf(get_string_data_filtered()$overall_satisfaction)(characteristics_string_means[8]))
     # 
     # characteristics_full_percentile = c(
-    #   ecdf(string_data_criteria$comfort)(characteristics_string_means[1]),
-    #   ecdf(string_data_criteria$control)(characteristics_string_means[2]),
-    #   ecdf(string_data_criteria$durability)(characteristics_string_means[3]),
-    #   ecdf(string_data_criteria$feel)(characteristics_string_means[4]),
-    #   ecdf(string_data_criteria$power)(characteristics_string_means[5]),
-    #   ecdf(string_data_criteria$spin)(characteristics_string_means[6]),
-    #   ecdf(string_data_criteria$tension_stability)(characteristics_string_means[7]),
-    #   ecdf(string_data_criteria$overall_satisfaction)(characteristics_string_means[8]))
+    #   ecdf(string_data_wrangled$comfort)(characteristics_string_means[1]),
+    #   ecdf(string_data_wrangled$control)(characteristics_string_means[2]),
+    #   ecdf(string_data_wrangled$durability)(characteristics_string_means[3]),
+    #   ecdf(string_data_wrangled$feel)(characteristics_string_means[4]),
+    #   ecdf(string_data_wrangled$power)(characteristics_string_means[5]),
+    #   ecdf(string_data_wrangled$spin)(characteristics_string_means[6]),
+    #   ecdf(string_data_wrangled$tension_stability)(characteristics_string_means[7]),
+    #   ecdf(string_data_wrangled$overall_satisfaction)(characteristics_string_means[8]))
     
     characteristics_sample_z = c(
       (characteristics_string_means[1] - characteristics_sample_means[1]) /
@@ -1117,21 +1121,21 @@ shinyServer(function(input, output){
       
     characteristics_full_z = c(
       (characteristics_string_means[1] - characteristics_full_means[1]) /
-        sd(string_data_criteria$comfort, na.rm = TRUE),
+        sd(string_data_wrangled$comfort, na.rm = TRUE),
       (characteristics_string_means[2] - characteristics_full_means[2]) /
-        sd(string_data_criteria$control, na.rm = TRUE),
+        sd(string_data_wrangled$control, na.rm = TRUE),
       (characteristics_string_means[3] - characteristics_full_means[3]) /
-        sd(string_data_criteria$durability, na.rm = TRUE),
+        sd(string_data_wrangled$durability, na.rm = TRUE),
       (characteristics_string_means[4] - characteristics_full_means[4]) /
-        sd(string_data_criteria$feel, na.rm = TRUE),
+        sd(string_data_wrangled$feel, na.rm = TRUE),
       (characteristics_string_means[5] - characteristics_full_means[5]) /
-        sd(string_data_criteria$power, na.rm = TRUE),
+        sd(string_data_wrangled$power, na.rm = TRUE),
       (characteristics_string_means[6] - characteristics_full_means[6]) /
-        sd(string_data_criteria$spin, na.rm = TRUE),
+        sd(string_data_wrangled$spin, na.rm = TRUE),
       (characteristics_string_means[7] - characteristics_full_means[7]) /
-        sd(string_data_criteria$tension_stability, na.rm = TRUE),
+        sd(string_data_wrangled$tension_stability, na.rm = TRUE),
       (characteristics_string_means[8] - characteristics_full_means[8]) /
-        sd(string_data_criteria$overall_satisfaction, na.rm = TRUE))
+        sd(string_data_wrangled$overall_satisfaction, na.rm = TRUE))
     
     characteristics_sample_percentile = pnorm(characteristics_sample_z) * 100
     
@@ -1253,19 +1257,19 @@ shinyServer(function(input, output){
     # 
     # all_adjectives_sample = unlist(get_string_data_filtered()$string_adjectives) 
     # 
-    # all_adjectives_full = unlist(string_data1$string_adjectives)
+    # all_adjectives_full = unlist(string_data_wrangled$string_adjectives)
     
     
     # get_adjective_pct2 = function(str, vec, df){
     #   (sum(vec == str, na.rm = TRUE) / nrow(df)) * 100
     # }
     
-    # test = string_data_criteria %>%
+    # test = string_data_wrangled %>%
     #   mutate(dull_pct = 
-    #            sum(unlist(string_data_criteria %>%
-    #                         filter(string_name == string_data_criteria$string_name) %>% 
+    #            sum(unlist(string_data_wrangled %>%
+    #                         filter(string_name == string_data_wrangled$string_name) %>% 
     #                         pull(string_adjectives)) == 'dull', na.rm = TRUE) / 
-    #            nrow(string_data_criteria %>%
+    #            nrow(string_data_wrangled %>%
     #                   filter(string_name == 'Luxilon Big Banger Alu Power 16L')) * 100)
     # test
     
@@ -1279,7 +1283,7 @@ shinyServer(function(input, output){
     
     adjective_pct_full_mtx = 
       sapply(adjectives_list, get_adjective_pct,
-             string_list = string_data_criteria$string_adjectives)
+             string_list = string_data_wrangled$string_adjectives)
     
     
     
@@ -1345,7 +1349,7 @@ shinyServer(function(input, output){
     # 
     # adjective_pct_full_vec = sapply(adjectives_list, get_adjective_pct2,
     #                                   vec = all_adjectives_full,
-    #                                   df = string_data1)
+    #                                   df = string_data_wrangled)
     
     # brks_adj_string_means = quantile(adjective_pct_string_means, 
     #                                  probs = seq(.05, .95, .05))
@@ -1414,7 +1418,7 @@ shinyServer(function(input, output){
 #     
 #     all_adjectives_sample = unlist(get_string_data_filtered()$string_adjectives) 
 #     
-#     all_adjectives_full = unlist(string_data1$string_adjectives)
+#     all_adjectives_full = unlist(string_data_wrangled$string_adjectives)
 #     
 #     
 #     get_adjective_rank = function(str, vec, df){
@@ -1431,7 +1435,7 @@ shinyServer(function(input, output){
 #     
 #     adjective_pct_full_vec = 
 #       sapply(adjectives_list, get_adjective_pct,
-#              string_list = string_data_criteria$string_adjectives)
+#              string_list = string_data_wrangled$string_adjectives)
 #     
 # # 
 # #     adjective_pct_string_vec = sapply(adjectives_list, get_adjective_pct2, 
@@ -1444,7 +1448,7 @@ shinyServer(function(input, output){
 # #     
 # #     adjective_pct_full_vec = sapply(adjectives_list, get_adjective_pct2, 
 # #                                     vec = all_adjectives_full, 
-# #                                     df = string_data1)
+# #                                     df = string_data_wrangled)
 # #     
 #     
 #     brks_string = quantile(colMeans(adjective_pct_string_vec), 

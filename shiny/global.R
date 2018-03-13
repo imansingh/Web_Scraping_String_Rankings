@@ -10,7 +10,7 @@ library(tm)
 library(wordcloud)
 library(memoise)
 
-# string_data <- fread("./stringforum.csv")
+# string_data <- fread("stringforum.csv")
 
 # string_data <- read.csv(file = "./stringforum.csv")
 
@@ -30,15 +30,15 @@ simpleCap = function(string){
 # get checkbox items names if df column is a vector
 
 get_checkbox_items_vec = function(string){
-  raw_strings = unique(string_data1[[string]][!is.na(string_data1[[string]])])
+  raw_strings = unique(string_data_criteria[[string]][!is.na(string_data_criteria[[string]])])
   processed_strings = unname(sort(sapply(gsub('_', ' ', raw_strings), simpleCap)))
   return(c(sort(processed_strings), none_text))
 }
 
 # get checkboax item names if df column is a list
 get_checkbox_items_list = function(string){
-  raw_strings = unique(unlist(string_data1[[string]]
-                              [!is.na(string_data1[[string]])]))
+  raw_strings = unique(unlist(string_data_criteria[[string]]
+                              [!is.na(string_data_criteria[[string]])]))
   processed_strings = unname(sapply(gsub('_', ' ', raw_strings), simpleCap))
   return(c(sort(processed_strings), none_text))
 }
@@ -46,11 +46,11 @@ get_checkbox_items_list = function(string){
 # ## models_by_manufacturer
 # # Create nested list of racquet models by manufacturer
 # models_by_manufacturer = list()
-# for(manufacturer in unique(string_data1$racquet_manufacturer[
-#   string_data1$racquet_manufacturer != ''])){
+# for(manufacturer in unique(string_data_criteria$racquet_manufacturer[
+#   string_data_criteria$racquet_manufacturer != ''])){
 #   models_by_manufacturer[[manufacturer]] = 
-#     sort(unique(string_data1$racquet_model[
-#       string_data1$racquet_manufacturer == manufacturer]))
+#     sort(unique(string_data_criteria$racquet_model[
+#       string_data_criteria$racquet_manufacturer == manufacturer]))
 # }
 
 adjectives_list = c('soft', 'comfortable', 'flexible', 'precise',
@@ -62,6 +62,19 @@ adjectives_list = c('soft', 'comfortable', 'flexible', 'precise',
 characteristics_list = c('comfort', 'control', 'durability', 'feel', 'power', 
                          'spin', 'tension_stability', 'overall_satisfaction')
 
+# selection lists for string_material, string_construction and string_features
+string_material_list =c( 'Aramid', 'Polyester', 'Co-Polyester', 'Polyamid', 
+                         'Polyethylene', 'Polyurethane', 'Zyex', 'Natural Gut')
+
+string_construction_list = c('Monofilament', 'Central Core with One Wrap',
+                             'Central Core with Two Wraps', 'Multifilament',
+                             'Ribbon Construction')
+
+string_features_list = c('Structured Surface', 'Titanium Coating', 
+                         'Titanium Fibers', 'Hybrid String')
+
+
+
 brks_percentile = seq(5,95,5)
 brks_z = qnorm(seq(.05,.95,.05))
 
@@ -72,6 +85,15 @@ clrs <- c(
   round(seq(255, 40, length.out = 10), 0) %>%
   {paste0("rgb(", ., ",255,", ., ")")}
 )
+
+## Create nested list of racquet models by manufacturer
+models_by_manufacturer = list()
+for(manufacturer in unique(string_data_criteria$racquet_manufacturer[
+  string_data_criteria$racquet_manufacturer != ''])){
+  models_by_manufacturer[[manufacturer]] = 
+    sort(unique(string_data_criteria$racquet_model[
+      string_data_criteria$racquet_manufacturer == manufacturer]))
+}
 
 ## get_adjective_pct
 # create vec that gives percentage of of strings in vec that match
