@@ -5,9 +5,9 @@ account: imansingh
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 296363
-bundleId: 1265041
+bundleId: 1267595
 url: https://imansingh.shinyapps.io/tennis_string_finder/
-when: 1520885882.08978
+when: 1520999072.64049
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: data_cleaning.R|stringforum.csv
+ignoredFiles: data_cleaning.R|string_data_criteria|stringforum.csv

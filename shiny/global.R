@@ -10,7 +10,7 @@ library(tm)
 library(wordcloud)
 library(memoise)
 
-# string_data <- fread("stringforum.csv")
+ string_data <- fread("string_data_wrangled.csv")
 
 # string_data <- read.csv(file = "./stringforum.csv")
 
@@ -30,15 +30,15 @@ simpleCap = function(string){
 # get checkbox items names if df column is a vector
 
 get_checkbox_items_vec = function(string){
-  raw_strings = unique(string_data_criteria[[string]][!is.na(string_data_criteria[[string]])])
+  raw_strings = unique(string_data[[string]][!is.na(string_data[[string]])])
   processed_strings = unname(sort(sapply(gsub('_', ' ', raw_strings), simpleCap)))
   return(c(sort(processed_strings), none_text))
 }
 
 # get checkboax item names if df column is a list
 get_checkbox_items_list = function(string){
-  raw_strings = unique(unlist(string_data_criteria[[string]]
-                              [!is.na(string_data_criteria[[string]])]))
+  raw_strings = unique(unlist(string_data[[string]]
+                              [!is.na(string_data[[string]])]))
   processed_strings = unname(sapply(gsub('_', ' ', raw_strings), simpleCap))
   return(c(sort(processed_strings), none_text))
 }
@@ -46,11 +46,11 @@ get_checkbox_items_list = function(string){
 # ## models_by_manufacturer
 # # Create nested list of racquet models by manufacturer
 # models_by_manufacturer = list()
-# for(manufacturer in unique(string_data_criteria$racquet_manufacturer[
-#   string_data_criteria$racquet_manufacturer != ''])){
+# for(manufacturer in unique(string_data$racquet_manufacturer[
+#   string_data$racquet_manufacturer != ''])){
 #   models_by_manufacturer[[manufacturer]] = 
-#     sort(unique(string_data_criteria$racquet_model[
-#       string_data_criteria$racquet_manufacturer == manufacturer]))
+#     sort(unique(string_data$racquet_model[
+#       string_data$racquet_manufacturer == manufacturer]))
 # }
 
 adjectives_list = c('soft', 'comfortable', 'flexible', 'precise',
@@ -88,11 +88,11 @@ clrs <- c(
 
 ## Create nested list of racquet models by manufacturer
 models_by_manufacturer = list()
-for(manufacturer in unique(string_data_criteria$racquet_manufacturer[
-  string_data_criteria$racquet_manufacturer != ''])){
+for(manufacturer in unique(string_data$racquet_manufacturer[
+  string_data$racquet_manufacturer != ''])){
   models_by_manufacturer[[manufacturer]] = 
-    sort(unique(string_data_criteria$racquet_model[
-      string_data_criteria$racquet_manufacturer == manufacturer]))
+    sort(unique(string_data$racquet_model[
+      string_data$racquet_manufacturer == manufacturer]))
 }
 
 ## get_adjective_pct

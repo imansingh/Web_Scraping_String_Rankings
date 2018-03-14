@@ -12,13 +12,17 @@ shinyServer(function(input, output){
                                  function(string) 
                                    unname(models_by_manufacturer[string]))
     
+    if(length(input$racquet_manufacturer) > 0){
+      placeholder = '(choose one or more)'
+    } else {
+      placeholder = '(select manufacturer first)'}
+    
     selectizeInput(
       'racquet_model',
       'Tester Racquet Model(s)',
       choices = filtered_model_list,
       multiple = TRUE,
-      options = list(placeholder = 
-                       '(choose one or more)',
+      options = list(placeholder = placeholder,
                      maxOptions = 2000))
   })
   
@@ -39,7 +43,7 @@ shinyServer(function(input, output){
   get_string_data_filtered = reactive({
     # Filter based on string criteria
     # create string_data_filtered and filter by string_minimum_reviews
-    string_data_filtered = string_data_wrangled %>%
+    string_data_filtered = string_data %>%
       filter(num_ratings >= input$string_minimum_reviews)
     
     # string_price
@@ -445,55 +449,33 @@ shinyServer(function(input, output){
 
      selector_table_adjectives = get_string_data_filtered() %>%
        # remove reviews with no adjectives listed
-       filter(!(string_adjectives == '')) %>%
+       filter(num_adjecs > 0) %>%
        # for each review get percentage of adjectives listed matching adjective
-       mutate(soft = get_adjective_pct(
-         get_string_data_filtered()$string_adjectives, 'soft')) %>%
-       mutate(comfortable = get_adjective_pct(
-         get_string_data_filtered()$string_adjectives, 'comfortable')) %>%
-       mutate(flexible = get_adjective_pct(
-         get_string_data_filtered()$string_adjectives, 'flexible')) %>%
-       mutate(precise = get_adjective_pct(
-         get_string_data_filtered()$string_adjectives, 'precise')) %>%
-       mutate(resilient = get_adjective_pct(
-         get_string_data_filtered()$string_adjectives, 'resilient')) %>%
-       mutate(explosive = get_adjective_pct(
-         get_string_data_filtered()$string_adjectives, 'explosive')) %>%
-       mutate(innovative = get_adjective_pct(
-         get_string_data_filtered()$string_adjectives, 'innovative')) %>%
-       mutate(unique = get_adjective_pct(
-         get_string_data_filtered()$string_adjectives, 'unique')) %>%
-       mutate(spongy = get_adjective_pct(
-         get_string_data_filtered()$string_adjectives, 'spongy')) %>%
-       mutate(stiff = get_adjective_pct(
-         get_string_data_filtered()$string_adjectives, 'stiff')) %>%
-       mutate(dull = get_adjective_pct(
-         get_string_data_filtered()$string_adjectives, 'dull')) %>%
-       mutate(lively = get_adjective_pct(
-         get_string_data_filtered()$string_adjectives, 'lively')) %>%
-       mutate(stretchy = get_adjective_pct(
-         get_string_data_filtered()$string_adjectives, 'stretchy')) %>%
-       mutate(crispy = get_adjective_pct(
-         get_string_data_filtered()$string_adjectives, 'crispy')) %>%
-       mutate(boring = get_adjective_pct(
-         get_string_data_filtered()$string_adjectives, 'boring')) %>%
-       mutate(elastic = get_adjective_pct(
-         get_string_data_filtered()$string_adjectives, 'elastic')) %>%
-       mutate(solid = get_adjective_pct(
-         get_string_data_filtered()$string_adjectives, 'solid')) %>%
-       mutate(rough = get_adjective_pct(
-         get_string_data_filtered()$string_adjectives, 'rough')) %>%
-       mutate(wire_like = get_adjective_pct(
-         get_string_data_filtered()$string_adjectives, 'wire_like')) %>%
-       mutate(springy = get_adjective_pct(
-         get_string_data_filtered()$string_adjectives, 'springy')) %>%
-       mutate(sluggish = get_adjective_pct(
-         get_string_data_filtered()$string_adjectives, 'sluggish')) %>%
-       mutate(outdated = get_adjective_pct(
-         get_string_data_filtered()$string_adjectives, 'outdated')) %>%
+       mutate(soft = soft / num_adjecs,
+              comfortable = comfortable / num_adjecs,
+              flexible = flexible / num_adjecs,
+              precise = precise / num_adjecs,
+              resilient = resilient / num_adjecs,
+              explosive = explosive / num_adjecs,
+              innovative = innovative / num_adjecs,
+              unique = unique / num_adjecs,
+              spongy = spongy / num_adjecs,
+              stiff = stiff / num_adjecs,
+              dull = dull / num_adjecs,
+              lively = lively / num_adjecs,
+              stretchy = stretchy / num_adjecs,
+              crispy = crispy / num_adjecs,
+              boring = boring / num_adjecs,
+              elastic = elastic / num_adjecs,
+              solid = solid / num_adjecs,
+              rough = rough / num_adjecs,
+              wire_like = wire_like / num_adjecs,
+              springy = springy / num_adjecs,
+              sluggish = sluggish / num_adjecs,
+              outdated = outdated / num_adjecs) %>%
        # group reviews by string name
        group_by(string_name) %>%
-       # for reviews grouped by string name get mean % for each adjective
+       # for each string get # adjective reviews and mean % of each adjective
        summarise(num_adjec_reviews = n(),
                  soft = mean(soft),
                  comfortable = mean(comfortable),
@@ -545,6 +527,7 @@ shinyServer(function(input, output){
        arrange(desc(adjectives_score))
      
      # convert adjectives_score to percentile - scale for z-stat, then pnorm
+     # the if statement - scaling doesn't work if no variation in the scores
      if(sum(selector_table_adjectives$adjectives_score) > 0){
        selector_table_adjectives =
          selector_table_adjectives %>%
@@ -934,21 +917,21 @@ shinyServer(function(input, output){
              racquet_manufacturer, racquet_model, string_pattern, frame_size,
              main_tension, cross_tension)
     
-    review_table_data$string_adjectives =
-      sapply(review_table_data$string_adjectives,
-             function(vec) paste(vec, collapse = ', '))
-    
-    review_table_data$string_material = 
-      sapply(review_table_data$string_material, 
-             function(vec) paste(vec, collapse = ', '))
-    
-    review_table_data$string_construction = 
-      sapply(review_table_data$string_construction, 
-             function(vec) paste(vec, collapse = ', '))
-    
-    review_table_data$string_features = 
-      sapply(review_table_data$string_features, 
-             function(vec) paste(vec, collapse = ', '))
+    # review_table_data$string_adjectives =
+    #   sapply(review_table_data$string_adjectives,
+    #          function(vec) paste(vec, collapse = ', '))
+    # 
+    # review_table_data$string_material = 
+    #   sapply(review_table_data$string_material, 
+    #          function(vec) paste(vec, collapse = ', '))
+    # 
+    # review_table_data$string_construction = 
+    #   sapply(review_table_data$string_construction, 
+    #          function(vec) paste(vec, collapse = ', '))
+    # 
+    # review_table_data$string_features = 
+    #   sapply(review_table_data$string_features, 
+    #          function(vec) paste(vec, collapse = ', '))
       
     
     # create datatable
@@ -1036,9 +1019,6 @@ shinyServer(function(input, output){
   output$characteristics_analysis_table = DT::renderDataTable({
     req(input$string_selected)
     
-    test = string_data[1,]
-    test %>% group_by(string_name) %>% summarise(mean(comfort))
-    
     # returns a dataframe grouped by string name with means of characteristics
     # get_characteristics_means = function(df){
     #   df %>% 
@@ -1059,27 +1039,99 @@ shinyServer(function(input, output){
         mean(get_string_data_specific()$overall_satisfaction, na.rm = TRUE)
       )
     
-    characteristics_sample_means = 
-      c(mean(get_string_data_filtered()$comfort, na.rm = TRUE),
-        mean(get_string_data_filtered()$control, na.rm = TRUE),
-        mean(get_string_data_filtered()$durability, na.rm = TRUE),
-        mean(get_string_data_filtered()$feel, na.rm = TRUE),
-        mean(get_string_data_filtered()$power, na.rm = TRUE),
-        mean(get_string_data_filtered()$spin, na.rm = TRUE),
-        mean(get_string_data_filtered()$tension_stability, na.rm = TRUE),
-        mean(get_string_data_filtered()$overall_satisfaction, na.rm = TRUE)
-      )
+    # characteristics_sample_means = 
+    #   c(mean(get_string_data_filtered()$comfort, na.rm = TRUE),
+    #     mean(get_string_data_filtered()$control, na.rm = TRUE),
+    #     mean(get_string_data_filtered()$durability, na.rm = TRUE),
+    #     mean(get_string_data_filtered()$feel, na.rm = TRUE),
+    #     mean(get_string_data_filtered()$power, na.rm = TRUE),
+    #     mean(get_string_data_filtered()$spin, na.rm = TRUE),
+    #     mean(get_string_data_filtered()$tension_stability, na.rm = TRUE),
+    #     mean(get_string_data_filtered()$overall_satisfaction, na.rm = TRUE)
+    #   )
     
+    characteristics_sample_means_df = get_string_data_filtered() %>%
+      group_by(string_name) %>%
+      summarise(
+        comfort = mean(comfort, na.rm = TRUE),
+        control = mean(control, na.rm = TRUE),
+        durability = mean(durability, na.rm = TRUE),
+        feel = mean(feel, na.rm = TRUE),
+        power = mean(power, na.rm = TRUE),
+        spin = mean(spin, na.rm = TRUE),
+        tension_stability = mean(tension_stability, na.rm = TRUE),
+        overall_satisfaction = mean(overall_satisfaction, na.rm = TRUE))
+    
+    # get mean for each characteristic (df is grouped, so mean of strings not reviews)
+    characteristics_sample_means = 
+      colMeans(characteristics_sample_means_df[,2:9], na.rm = TRUE)
+    
+    # characteristics_full_means = 
+    #   c(mean(string_data$comfort, na.rm = TRUE),
+    #     mean(string_data$control, na.rm = TRUE),
+    #     mean(string_data$durability, na.rm = TRUE),
+    #     mean(string_data$feel, na.rm = TRUE),
+    #     mean(string_data$power, na.rm = TRUE),
+    #     mean(string_data$spin, na.rm = TRUE),
+    #     mean(string_data$tension_stability, na.rm = TRUE),
+    #     mean(string_data$overall_satisfaction, na.rm = TRUE)
+    #   )
+    
+    characteristics_full_means_df = string_data %>%
+      group_by(string_name) %>%
+      summarise(
+        comfort = mean(comfort, na.rm = TRUE),
+        control = mean(control, na.rm = TRUE),
+        durability = mean(durability, na.rm = TRUE),
+        feel = mean(feel, na.rm = TRUE),
+        power = mean(power, na.rm = TRUE),
+        spin = mean(spin, na.rm = TRUE),
+        tension_stability = mean(tension_stability, na.rm = TRUE),
+        overall_satisfaction = mean(overall_satisfaction, na.rm = TRUE))
+    
+    # get mean for each characteristic (df is grouped, so mean of strings not reviews)
     characteristics_full_means = 
-      c(mean(string_data_wrangled$comfort, na.rm = TRUE),
-        mean(string_data_wrangled$control, na.rm = TRUE),
-        mean(string_data_wrangled$durability, na.rm = TRUE),
-        mean(string_data_wrangled$feel, na.rm = TRUE),
-        mean(string_data_wrangled$power, na.rm = TRUE),
-        mean(string_data_wrangled$spin, na.rm = TRUE),
-        mean(string_data_wrangled$tension_stability, na.rm = TRUE),
-        mean(string_data_wrangled$overall_satisfaction, na.rm = TRUE)
-      )
+      colMeans(characteristics_full_means_df[,2:9], na.rm = TRUE)
+    
+    # # add columns to grouped df for rank, percentile and z-score
+    # characteristics_full_means_df = characteristics_full_means_df %>%
+    #   mutate(
+    #     comfort_rank = min_rank(desc(comfort)),
+    #     control_rank = min_rank(desc(control)),
+    #     durability_rank = min_rank(desc(durability)),
+    #     feel_rank = min_rank(desc(feel)),
+    #     power_rank = min_rank(desc(power)),
+    #     spin_rank = min_rank(desc(spin)),
+    #     tension_stability_rank = min_rank(desc(tension_stability)),
+    #     overall_satisfaction_rank = min_rank(desc(overall_satisfaction))) %>%
+    #   mutate(
+    #     comfort_percentile = ntile(comfort, n = 100),
+    #     control_percentile = ntile(control, n = 100),
+    #     durability_percentile = ntile(durability, n = 100),
+    #     feel_percentile = ntile(feel, n = 100),
+    #     power_percentile = ntile(power, n = 100),
+    #     spin_percentile = ntile(spin, n = 100),
+    #     tension_stability_percentile = ntile(tension_stability, n = 100),
+    #     overall_satisfaction_percentile = ntile(overall_satisfaction, n = 100)) %>%
+    #   mutate(
+    #     comfort_z = (comfort - characteristics_full_means[1]) /
+    #       sd(characteristics_full_means_df$comfort, na.rm = TRUE),
+    #     control_z = (control - characteristics_full_means[2]) /
+    #       sd(characteristics_full_means_df$control, na.rm = TRUE),
+    #     durability_z = (durability - characteristics_full_means[3]) /
+    #       sd(characteristics_full_means_df$durability, na.rm = TRUE),
+    #     feel_z = (feel - characteristics_full_means[4]) /
+    #       sd(characteristics_full_means_df$feel, na.rm = TRUE),
+    #     power_z = (power - characteristics_full_means[5]) /
+    #       sd(characteristics_full_means_df$power, na.rm = TRUE),
+    #     spin_z = (spin - characteristics_full_means[6]) /
+    #       sd(characteristics_full_means_df$spin, na.rm = TRUE),
+    #     tension_stability_z = (tension_stability - characteristics_full_means[7]) /
+    #       sd(characteristics_full_means_df$tension_stability, na.rm = TRUE),
+    #     overall_satisfaction_z = (overall_satisfaction - characteristics_full_means[8]) /
+    #       sd(characteristics_full_means_df$overall_satisfaction, na.rm = TRUE),
+    #   )
+    # 
 
     # characteristics_sample_percentile = c(
     #   ecdf(get_string_data_filtered()$comfort)(characteristics_string_means[1]),
@@ -1092,50 +1144,50 @@ shinyServer(function(input, output){
     #   ecdf(get_string_data_filtered()$overall_satisfaction)(characteristics_string_means[8]))
     # 
     # characteristics_full_percentile = c(
-    #   ecdf(string_data_wrangled$comfort)(characteristics_string_means[1]),
-    #   ecdf(string_data_wrangled$control)(characteristics_string_means[2]),
-    #   ecdf(string_data_wrangled$durability)(characteristics_string_means[3]),
-    #   ecdf(string_data_wrangled$feel)(characteristics_string_means[4]),
-    #   ecdf(string_data_wrangled$power)(characteristics_string_means[5]),
-    #   ecdf(string_data_wrangled$spin)(characteristics_string_means[6]),
-    #   ecdf(string_data_wrangled$tension_stability)(characteristics_string_means[7]),
-    #   ecdf(string_data_wrangled$overall_satisfaction)(characteristics_string_means[8]))
+    #   ecdf(string_data$comfort)(characteristics_string_means[1]),
+    #   ecdf(string_data$control)(characteristics_string_means[2]),
+    #   ecdf(string_data$durability)(characteristics_string_means[3]),
+    #   ecdf(string_data$feel)(characteristics_string_means[4]),
+    #   ecdf(string_data$power)(characteristics_string_means[5]),
+    #   ecdf(string_data$spin)(characteristics_string_means[6]),
+    #   ecdf(string_data$tension_stability)(characteristics_string_means[7]),
+    #   ecdf(string_data$overall_satisfaction)(characteristics_string_means[8]))
     
     characteristics_sample_z = c(
       (characteristics_string_means[1] - characteristics_sample_means[1]) /
-        sd(get_string_data_filtered()$comfort, na.rm = TRUE),
+        sd(characteristics_sample_means_df$comfort, na.rm = TRUE),
       (characteristics_string_means[2] - characteristics_sample_means[2]) /
-        sd(get_string_data_filtered()$control, na.rm = TRUE),
+        sd(characteristics_sample_means_df$control, na.rm = TRUE),
       (characteristics_string_means[3] - characteristics_sample_means[3]) /
-        sd(get_string_data_filtered()$durability, na.rm = TRUE),
+        sd(characteristics_sample_means_df$durability, na.rm = TRUE),
       (characteristics_string_means[4] - characteristics_sample_means[4]) /
-        sd(get_string_data_filtered()$feel, na.rm = TRUE),
+        sd(characteristics_sample_means_df$feel, na.rm = TRUE),
       (characteristics_string_means[5] - characteristics_sample_means[5]) /
-        sd(get_string_data_filtered()$power, na.rm = TRUE),
+        sd(characteristics_sample_means_df$power, na.rm = TRUE),
       (characteristics_string_means[6] - characteristics_sample_means[6]) /
-        sd(get_string_data_filtered()$spin, na.rm = TRUE),
+        sd(characteristics_sample_means_df$spin, na.rm = TRUE),
       (characteristics_string_means[7] - characteristics_sample_means[7]) /
-        sd(get_string_data_filtered()$tension_stability, na.rm = TRUE),
+        sd(characteristics_sample_means_df$tension_stability, na.rm = TRUE),
       (characteristics_string_means[8] - characteristics_sample_means[8]) /
-        sd(get_string_data_filtered()$overall_satisfaction, na.rm = TRUE))
+        sd(characteristics_sample_means_df$overall_satisfaction, na.rm = TRUE))
       
     characteristics_full_z = c(
       (characteristics_string_means[1] - characteristics_full_means[1]) /
-        sd(string_data_wrangled$comfort, na.rm = TRUE),
+        sd(characteristics_full_means_df$comfort, na.rm = TRUE),
       (characteristics_string_means[2] - characteristics_full_means[2]) /
-        sd(string_data_wrangled$control, na.rm = TRUE),
+        sd(characteristics_full_means_df$control, na.rm = TRUE),
       (characteristics_string_means[3] - characteristics_full_means[3]) /
-        sd(string_data_wrangled$durability, na.rm = TRUE),
+        sd(characteristics_full_means_df$durability, na.rm = TRUE),
       (characteristics_string_means[4] - characteristics_full_means[4]) /
-        sd(string_data_wrangled$feel, na.rm = TRUE),
+        sd(characteristics_full_means_df$feel, na.rm = TRUE),
       (characteristics_string_means[5] - characteristics_full_means[5]) /
-        sd(string_data_wrangled$power, na.rm = TRUE),
+        sd(characteristics_full_means_df$power, na.rm = TRUE),
       (characteristics_string_means[6] - characteristics_full_means[6]) /
-        sd(string_data_wrangled$spin, na.rm = TRUE),
+        sd(characteristics_full_means_df$spin, na.rm = TRUE),
       (characteristics_string_means[7] - characteristics_full_means[7]) /
-        sd(string_data_wrangled$tension_stability, na.rm = TRUE),
+        sd(characteristics_full_means_df$tension_stability, na.rm = TRUE),
       (characteristics_string_means[8] - characteristics_full_means[8]) /
-        sd(string_data_wrangled$overall_satisfaction, na.rm = TRUE))
+        sd(characteristics_full_means_df$overall_satisfaction, na.rm = TRUE))
     
     characteristics_sample_percentile = pnorm(characteristics_sample_z) * 100
     
@@ -1257,78 +1309,264 @@ shinyServer(function(input, output){
     # 
     # all_adjectives_sample = unlist(get_string_data_filtered()$string_adjectives) 
     # 
-    # all_adjectives_full = unlist(string_data_wrangled$string_adjectives)
+    # all_adjectives_full = unlist(string_data$string_adjectives)
     
     
     # get_adjective_pct2 = function(str, vec, df){
     #   (sum(vec == str, na.rm = TRUE) / nrow(df)) * 100
     # }
     
-    # test = string_data_wrangled %>%
+    # test = string_data %>%
     #   mutate(dull_pct = 
-    #            sum(unlist(string_data_wrangled %>%
-    #                         filter(string_name == string_data_wrangled$string_name) %>% 
+    #            sum(unlist(string_data %>%
+    #                         filter(string_name == string_data$string_name) %>% 
     #                         pull(string_adjectives)) == 'dull', na.rm = TRUE) / 
-    #            nrow(string_data_wrangled %>%
+    #            nrow(string_data %>%
     #                   filter(string_name == 'Luxilon Big Banger Alu Power 16L')) * 100)
     # test
     
-    adjective_pct_string_mtx = 
-      sapply(adjectives_list, get_adjective_pct,
-             string_list = get_string_data_specific()$string_adjectives)
+    adjectives_string_means = 
+      c(mean(get_string_data_specific()$soft, na.rm = TRUE),
+        mean(get_string_data_specific()$comfortable, na.rm = TRUE),
+        mean(get_string_data_specific()$flexible, na.rm = TRUE),
+        mean(get_string_data_specific()$precise, na.rm = TRUE),
+        mean(get_string_data_specific()$resilient, na.rm = TRUE),
+        mean(get_string_data_specific()$explosive, na.rm = TRUE),
+        mean(get_string_data_specific()$innovative, na.rm = TRUE),
+        mean(get_string_data_specific()$unique, na.rm = TRUE),
+        mean(get_string_data_specific()$spongy, na.rm = TRUE),
+        mean(get_string_data_specific()$stiff, na.rm = TRUE),
+        mean(get_string_data_specific()$dull, na.rm = TRUE),
+        mean(get_string_data_specific()$lively, na.rm = TRUE),
+        mean(get_string_data_specific()$stretchy, na.rm = TRUE),
+        mean(get_string_data_specific()$crispy, na.rm = TRUE),
+        mean(get_string_data_specific()$boring, na.rm = TRUE),
+        mean(get_string_data_specific()$elastic, na.rm = TRUE),
+        mean(get_string_data_specific()$solid, na.rm = TRUE),
+        mean(get_string_data_specific()$rough, na.rm = TRUE),
+        mean(get_string_data_specific()$wire_like, na.rm = TRUE),
+        mean(get_string_data_specific()$springy, na.rm = TRUE),
+        mean(get_string_data_specific()$sluggish, na.rm = TRUE),
+        mean(get_string_data_specific()$outdated, na.rm = TRUE)
+        )
     
-    adjective_pct_sample_mtx = 
-      sapply(adjectives_list, get_adjective_pct,
-             string_list = get_string_data_filtered()$string_adjectives)
+    adjectives_sample_means_df = get_string_data_filtered() %>%
+      group_by(string_name) %>%
+      summarise(
+        soft = mean(soft, na.rm = TRUE),
+        comfortable = mean(comfortable, na.rm = TRUE),
+        flexible = mean(flexible, na.rm = TRUE),
+        precise = mean(precise, na.rm = TRUE),
+        resilient = mean(resilient, na.rm = TRUE),
+        explosive = mean(explosive, na.rm = TRUE),
+        innovative = mean(innovative, na.rm = TRUE),
+        unique = mean(unique, na.rm = TRUE),
+        spongy = mean(spongy, na.rm = TRUE),
+        stiff = mean(stiff, na.rm = TRUE),
+        dull = mean(dull, na.rm = TRUE),
+        lively = mean(lively, na.rm = TRUE),
+        stretchy = mean(stretchy, na.rm = TRUE),
+        crispy = mean(crispy, na.rm = TRUE),
+        boring = mean(boring, na.rm = TRUE),
+        elastic = mean(elastic, na.rm = TRUE),
+        solid = mean(solid, na.rm = TRUE),
+        rough = mean(rough, na.rm = TRUE),
+        wire_like = mean(wire_like, na.rm = TRUE),
+        springy = mean(springy, na.rm = TRUE),
+        sluggish = mean(sluggish, na.rm = TRUE),
+        outdated = mean(outdated, na.rm = TRUE)
+        )
     
-    adjective_pct_full_mtx = 
-      sapply(adjectives_list, get_adjective_pct,
-             string_list = string_data_wrangled$string_adjectives)
+    # get mean for each characteristic (df is grouped, so mean of strings not reviews)
+    adjectives_sample_means = 
+      colMeans(adjectives_sample_means_df[,2:23], na.rm = TRUE)
+    
+    adjectives_full_means_df = string_data %>%
+      group_by(string_name) %>%
+      summarise(
+        soft = mean(soft, na.rm = TRUE),
+        comfortable = mean(comfortable, na.rm = TRUE),
+        flexible = mean(flexible, na.rm = TRUE),
+        precise = mean(precise, na.rm = TRUE),
+        resilient = mean(resilient, na.rm = TRUE),
+        explosive = mean(explosive, na.rm = TRUE),
+        innovative = mean(innovative, na.rm = TRUE),
+        unique = mean(unique, na.rm = TRUE),
+        spongy = mean(spongy, na.rm = TRUE),
+        stiff = mean(stiff, na.rm = TRUE),
+        dull = mean(dull, na.rm = TRUE),
+        lively = mean(lively, na.rm = TRUE),
+        stretchy = mean(stretchy, na.rm = TRUE),
+        crispy = mean(crispy, na.rm = TRUE),
+        boring = mean(boring, na.rm = TRUE),
+        elastic = mean(elastic, na.rm = TRUE),
+        solid = mean(solid, na.rm = TRUE),
+        rough = mean(rough, na.rm = TRUE),
+        wire_like = mean(wire_like, na.rm = TRUE),
+        springy = mean(springy, na.rm = TRUE),
+        sluggish = mean(sluggish, na.rm = TRUE),
+        outdated = mean(outdated, na.rm = TRUE)
+      )
+    
+    # get mean for each characteristic (df is grouped, so mean of strings not reviews)
+    adjectives_full_means = 
+      colMeans(adjectives_full_means_df[,2:23], na.rm = TRUE)
+    
+    adjectives_sample_z = c(
+      (adjectives_string_means[1] - adjectives_sample_means[1]) /
+        sd(adjectives_sample_means_df$soft, na.rm = TRUE),
+      (adjectives_string_means[2] - adjectives_sample_means[2]) /
+        sd(adjectives_sample_means_df$comfortable, na.rm = TRUE),
+      (adjectives_string_means[3] - adjectives_sample_means[3]) /
+        sd(adjectives_sample_means_df$flexible, na.rm = TRUE),
+      (adjectives_string_means[4] - adjectives_sample_means[4]) /
+        sd(adjectives_sample_means_df$precise, na.rm = TRUE),
+      (adjectives_string_means[5] - adjectives_sample_means[5]) /
+        sd(adjectives_sample_means_df$resilient, na.rm = TRUE),
+      (adjectives_string_means[6] - adjectives_sample_means[6]) /
+        sd(adjectives_sample_means_df$explosive, na.rm = TRUE),
+      (adjectives_string_means[7] - adjectives_sample_means[7]) /
+        sd(adjectives_sample_means_df$innovative, na.rm = TRUE),
+      (adjectives_string_means[8] - adjectives_sample_means[8]) /
+        sd(adjectives_sample_means_df$unique, na.rm = TRUE),
+      (adjectives_string_means[9] - adjectives_sample_means[9]) /
+        sd(adjectives_sample_means_df$spongy, na.rm = TRUE),
+      (adjectives_string_means[10] - adjectives_sample_means[10]) /
+        sd(adjectives_sample_means_df$stiff, na.rm = TRUE),
+      (adjectives_string_means[11] - adjectives_sample_means[11]) /
+        sd(adjectives_sample_means_df$dull, na.rm = TRUE),
+      (adjectives_string_means[12] - adjectives_sample_means[12]) /
+        sd(adjectives_sample_means_df$lively, na.rm = TRUE),
+      (adjectives_string_means[13] - adjectives_sample_means[13]) /
+        sd(adjectives_sample_means_df$stretchy, na.rm = TRUE),
+      (adjectives_string_means[14] - adjectives_sample_means[14]) /
+        sd(adjectives_sample_means_df$crispy, na.rm = TRUE),
+      (adjectives_string_means[15] - adjectives_sample_means[15]) /
+        sd(adjectives_sample_means_df$boring, na.rm = TRUE),
+      (adjectives_string_means[16] - adjectives_sample_means[16]) /
+        sd(adjectives_sample_means_df$elastic, na.rm = TRUE),
+      (adjectives_string_means[17] - adjectives_sample_means[17]) /
+        sd(adjectives_sample_means_df$solid, na.rm = TRUE),
+      (adjectives_string_means[18] - adjectives_sample_means[18]) /
+        sd(adjectives_sample_means_df$rough, na.rm = TRUE),
+      (adjectives_string_means[19] - adjectives_sample_means[19]) /
+        sd(adjectives_sample_means_df$wire_like, na.rm = TRUE),
+      (adjectives_string_means[20] - adjectives_sample_means[20]) /
+        sd(adjectives_sample_means_df$springy, na.rm = TRUE),
+      (adjectives_string_means[21] - adjectives_sample_means[21]) /
+        sd(adjectives_sample_means_df$sluggish, na.rm = TRUE),
+      (adjectives_string_means[22] - adjectives_sample_means[22]) /
+        sd(adjectives_sample_means_df$outdated, na.rm = TRUE)
+      )
+    
+    adjectives_full_z = c(
+      (adjectives_string_means[1] - adjectives_sample_means[1]) /
+        sd(adjectives_full_means_df$soft, na.rm = TRUE),
+      (adjectives_string_means[2] - adjectives_sample_means[2]) /
+        sd(adjectives_full_means_df$comfortable, na.rm = TRUE),
+      (adjectives_string_means[3] - adjectives_sample_means[3]) /
+        sd(adjectives_full_means_df$flexible, na.rm = TRUE),
+      (adjectives_string_means[4] - adjectives_sample_means[4]) /
+        sd(adjectives_full_means_df$precise, na.rm = TRUE),
+      (adjectives_string_means[5] - adjectives_sample_means[5]) /
+        sd(adjectives_full_means_df$resilient, na.rm = TRUE),
+      (adjectives_string_means[6] - adjectives_sample_means[6]) /
+        sd(adjectives_full_means_df$explosive, na.rm = TRUE),
+      (adjectives_string_means[7] - adjectives_sample_means[7]) /
+        sd(adjectives_full_means_df$innovative, na.rm = TRUE),
+      (adjectives_string_means[8] - adjectives_sample_means[8]) /
+        sd(adjectives_full_means_df$unique, na.rm = TRUE),
+      (adjectives_string_means[9] - adjectives_sample_means[9]) /
+        sd(adjectives_full_means_df$spongy, na.rm = TRUE),
+      (adjectives_string_means[10] - adjectives_sample_means[10]) /
+        sd(adjectives_full_means_df$stiff, na.rm = TRUE),
+      (adjectives_string_means[11] - adjectives_sample_means[11]) /
+        sd(adjectives_full_means_df$dull, na.rm = TRUE),
+      (adjectives_string_means[12] - adjectives_sample_means[12]) /
+        sd(adjectives_full_means_df$lively, na.rm = TRUE),
+      (adjectives_string_means[13] - adjectives_sample_means[13]) /
+        sd(adjectives_full_means_df$stretchy, na.rm = TRUE),
+      (adjectives_string_means[14] - adjectives_sample_means[14]) /
+        sd(adjectives_full_means_df$crispy, na.rm = TRUE),
+      (adjectives_string_means[15] - adjectives_sample_means[15]) /
+        sd(adjectives_full_means_df$boring, na.rm = TRUE),
+      (adjectives_string_means[16] - adjectives_sample_means[16]) /
+        sd(adjectives_full_means_df$elastic, na.rm = TRUE),
+      (adjectives_string_means[17] - adjectives_sample_means[17]) /
+        sd(adjectives_full_means_df$solid, na.rm = TRUE),
+      (adjectives_string_means[18] - adjectives_sample_means[18]) /
+        sd(adjectives_full_means_df$rough, na.rm = TRUE),
+      (adjectives_string_means[19] - adjectives_sample_means[19]) /
+        sd(adjectives_full_means_df$wire_like, na.rm = TRUE),
+      (adjectives_string_means[20] - adjectives_sample_means[20]) /
+        sd(adjectives_full_means_df$springy, na.rm = TRUE),
+      (adjectives_string_means[21] - adjectives_sample_means[21]) /
+        sd(adjectives_full_means_df$sluggish, na.rm = TRUE),
+      (adjectives_string_means[22] - adjectives_sample_means[22]) /
+        sd(adjectives_full_means_df$outdated, na.rm = TRUE)
+    )
+
+    adjectives_sample_percentile = pnorm(adjectives_sample_z) * 100
+    
+    adjectives_full_percentile = pnorm(adjectives_full_z) * 100
     
     
-    
-    
-    adjective_pct_string_means = colMeans(adjective_pct_string_mtx)
-    adjective_pct_sample_means = colMeans(adjective_pct_sample_mtx)
-    adjective_pct_full_means = colMeans(adjective_pct_full_mtx)
-    
-    # # create empty vectors for efficiency
-    # adjective_pct_sample_percentile = 
-    #   vector(mode = "double", length = length(adjective_pct_string_means))
-    # adjective_pct_full_percentile = 
-    #   vector(mode = "double", length = length(adjective_pct_string_means))
+    # adjective_pct_string_mtx = 
+    #   sapply(adjectives_list, get_adjective_pct,
+    #          string_list = get_string_data_specific()$string_adjectives)
     # 
-    # # get percentile for each column
-    # # note: since the matrixes are not grouped by string, these are not really 
-    # #       percentile of a string within a larger group of strings
-    # #       we are actually computing percentile of a string (mean value 
-    # #       of all the reviews) within the larger group of all reviews. 
-    # for(i in seq_along(adjective_pct_string_means)){
-    #   adjective_pct_sample_percentile[i] = 
-    #     ecdf(adjective_pct_sample_mtx[ ,i])(adjective_pct_string_means[i]) * 100
-    #   adjective_pct_full_percentile[i] = 
-    #     ecdf(adjective_pct_full_mtx[, i])(adjective_pct_string_means[i]) * 100
-    # }
-    
-    #    adjective_pct_string_sd = apply(adjective_pct_string_mtx, 2, sd)
-    adjective_pct_sample_sd = apply(adjective_pct_sample_mtx, 2, sd)
-    adjective_pct_full_sd = apply(adjective_pct_full_mtx, 2, sd)
-    
-    adjective_pct_sample_sd = apply(adjective_pct_sample_mtx, 2, sd)
-    adjective_pct_full_sd = apply(adjective_pct_full_mtx, 2, sd)
-    
-    adjective_pct_sample_z = 
-      (adjective_pct_string_means - adjective_pct_sample_means) /
-      adjective_pct_sample_sd
-    
-    adjective_pct_full_z = 
-      (adjective_pct_string_means - adjective_pct_full_means) /
-      adjective_pct_full_sd
-    
-    adjective_pct_sample_percentile = pnorm(adjective_pct_sample_z) * 100
-    
-    adjective_pct_full_percentile = pnorm(adjective_pct_full_z) * 100
-    
+    # adjective_pct_sample_mtx = 
+    #   sapply(adjectives_list, get_adjective_pct,
+    #          string_list = get_string_data_filtered()$string_adjectives)
+    # 
+    # adjective_pct_full_mtx = 
+    #   sapply(adjectives_list, get_adjective_pct,
+    #          string_list = string_data$string_adjectives)
+    # 
+    # 
+    # 
+    # 
+    # adjective_pct_string_means = colMeans(adjective_pct_string_mtx)
+    # adjective_pct_sample_means = colMeans(adjective_pct_sample_mtx)
+    # adjective_pct_full_means = colMeans(adjective_pct_full_mtx)
+    # 
+    # # # create empty vectors for efficiency
+    # # adjective_pct_sample_percentile = 
+    # #   vector(mode = "double", length = length(adjective_pct_string_means))
+    # # adjective_pct_full_percentile = 
+    # #   vector(mode = "double", length = length(adjective_pct_string_means))
+    # # 
+    # # # get percentile for each column
+    # # # note: since the matrixes are not grouped by string, these are not really 
+    # # #       percentile of a string within a larger group of strings
+    # # #       we are actually computing percentile of a string (mean value 
+    # # #       of all the reviews) within the larger group of all reviews. 
+    # # for(i in seq_along(adjective_pct_string_means)){
+    # #   adjective_pct_sample_percentile[i] = 
+    # #     ecdf(adjective_pct_sample_mtx[ ,i])(adjective_pct_string_means[i]) * 100
+    # #   adjective_pct_full_percentile[i] = 
+    # #     ecdf(adjective_pct_full_mtx[, i])(adjective_pct_string_means[i]) * 100
+    # # }
+    # 
+    # #    adjective_pct_string_sd = apply(adjective_pct_string_mtx, 2, sd)
+    # adjective_pct_sample_sd = apply(adjective_pct_sample_mtx, 2, sd)
+    # adjective_pct_full_sd = apply(adjective_pct_full_mtx, 2, sd)
+    # 
+    # adjective_pct_sample_sd = apply(adjective_pct_sample_mtx, 2, sd)
+    # adjective_pct_full_sd = apply(adjective_pct_full_mtx, 2, sd)
+    # 
+    # adjective_pct_sample_z = 
+    #   (adjective_pct_string_means - adjective_pct_sample_means) /
+    #   adjective_pct_sample_sd
+    # 
+    # adjective_pct_full_z = 
+    #   (adjective_pct_string_means - adjective_pct_full_means) /
+    #   adjective_pct_full_sd
+    # 
+    # adjective_pct_sample_percentile = pnorm(adjective_pct_sample_z) * 100
+    # 
+    # adjective_pct_full_percentile = pnorm(adjective_pct_full_z) * 100
+    # 
     # adjective_pct_sample_z = 
     #   (adjective_pct_string_means - adjective_pct_sample_means) /
     #   adjective_pct_sample_sd
@@ -1349,7 +1587,7 @@ shinyServer(function(input, output){
     # 
     # adjective_pct_full_vec = sapply(adjectives_list, get_adjective_pct2,
     #                                   vec = all_adjectives_full,
-    #                                   df = string_data_wrangled)
+    #                                   df = string_data)
     
     # brks_adj_string_means = quantile(adjective_pct_string_means, 
     #                                  probs = seq(.05, .95, .05))
@@ -1360,25 +1598,25 @@ shinyServer(function(input, output){
     # brks_adj_full_means = quantile(adjective_pct_full_means, 
     #                                probs = seq(.05, .95, .05))
     
-    brks_adj_sample_z = quantile(adjective_pct_sample_z, 
-                                 probs = seq(.05, .95, .05))
-    
-    brks_adj_full_z = quantile(adjective_pct_full_z, 
-                               probs = seq(.05, .95, .05))
+    # brks_adj_sample_z = quantile(adjective_pct_sample_z, 
+    #                              probs = seq(.05, .95, .05))
+    # 
+    # brks_adj_full_z = quantile(adjective_pct_full_z, 
+    #                            probs = seq(.05, .95, .05))
     
     
     adjectives_analysis_df = 
       data.frame(adjectives_list,
-                 adjective_pct_string_means = adjective_pct_string_means / 100,
-                 adjective_pct_sample_means = adjective_pct_sample_means / 100,
-                 adjective_pct_sample_percentile = 
-                   round(adjective_pct_sample_percentile, 1),
-                 adjective_pct_sample_z = round(adjective_pct_sample_z, 2),
-                 adjective_pct_full_means = adjective_pct_full_means / 100,
-                 adjective_pct_full_percentile = 
-                   round(adjective_pct_full_percentile, 1),
-                 adjective_pct_full_z = round(adjective_pct_full_z, 2)) %>%
-      arrange(desc(adjective_pct_string_means))
+                 adjectives_string_means,
+                 adjectives_sample_means,
+                 adjectives_sample_percentile = 
+                   round(adjectives_sample_percentile, 1),
+                 adjectives_sample_z = round(adjectives_sample_z, 2),
+                 adjectives_full_means,
+                 adjectives_full_percentile = 
+                   round(adjectives_full_percentile, 1),
+                 adjectives_full_z = round(adjectives_full_z, 2)) %>%
+      arrange(desc(adjectives_string_means))
     
     datatable(adjectives_analysis_df, rownames=FALSE,
               caption = 'selected sample = what is selected in search criteria',
@@ -1391,22 +1629,22 @@ shinyServer(function(input, output){
                               #colReorder = TRUE,
                               # fixedColumns = TRUE, 
                               autoWidth = TRUE)))  %>%
-      formatPercentage(columns = c('adjective_pct_string_means', 
-                                   'adjective_pct_sample_means', 
-                                   'adjective_pct_full_means'), digits = 1) %>%
+      formatPercentage(columns = c('adjectives_string_means', 
+                                   'adjectives_sample_means', 
+                                   'adjectives_full_means'), digits = 1) %>%
       # formatStyle(columns = 'adjective_pct_string_means',
       #             backgroundColor = styleInterval(brks_adj_string_means, clrs)) %>%
       # formatStyle(columns = 'adjective_pct_sample_means',
       #             backgroundColor = styleInterval(brks_adj_sample_means, clrs)) %>%
-      formatStyle(columns = 'adjective_pct_sample_percentile',
+      formatStyle(columns = 'adjectives_sample_percentile',
                   backgroundColor = styleInterval(brks_percentile, clrs)) %>%
-      formatStyle(columns = 'adjective_pct_sample_z',
+      formatStyle(columns = 'adjectives_sample_z',
                   backgroundColor = styleInterval(brks_z, clrs)) %>%
       # formatStyle(columns = 'adjective_pct_full_means',
       #             backgroundColor = styleInterval(brks_adj_full_means, clrs)) %>%
-      formatStyle(columns = 'adjective_pct_full_percentile',
+      formatStyle(columns = 'adjectives_full_percentile',
                   backgroundColor = styleInterval(brks_percentile, clrs)) %>%
-      formatStyle(columns = 'adjective_pct_full_z',
+      formatStyle(columns = 'adjectives_full_z',
                   backgroundColor = styleInterval(brks_z, clrs))
   })
 #   output$adjectives_rank_table = DT::renderDataTable({
@@ -1418,7 +1656,7 @@ shinyServer(function(input, output){
 #     
 #     all_adjectives_sample = unlist(get_string_data_filtered()$string_adjectives) 
 #     
-#     all_adjectives_full = unlist(string_data_wrangled$string_adjectives)
+#     all_adjectives_full = unlist(string_data$string_adjectives)
 #     
 #     
 #     get_adjective_rank = function(str, vec, df){
@@ -1435,7 +1673,7 @@ shinyServer(function(input, output){
 #     
 #     adjective_pct_full_vec = 
 #       sapply(adjectives_list, get_adjective_pct,
-#              string_list = string_data_wrangled$string_adjectives)
+#              string_list = string_data$string_adjectives)
 #     
 # # 
 # #     adjective_pct_string_vec = sapply(adjectives_list, get_adjective_pct2, 
@@ -1448,7 +1686,7 @@ shinyServer(function(input, output){
 # #     
 # #     adjective_pct_full_vec = sapply(adjectives_list, get_adjective_pct2, 
 # #                                     vec = all_adjectives_full, 
-# #                                     df = string_data_wrangled)
+# #                                     df = string_data)
 # #     
 #     
 #     brks_string = quantile(colMeans(adjective_pct_string_vec), 

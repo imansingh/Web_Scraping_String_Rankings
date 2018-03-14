@@ -50,22 +50,22 @@ shinyUI(dashboardPage(
                            fluidRow(
                              box(sliderInput('string_minimum_reviews', 
                                              'Minimum # of Total Reviews', 
-                                             min = min(string_data_wrangled$num_ratings, 
+                                             min = min(string_data$num_ratings, 
                                                        na.rm = TRUE), 
-                                             max = max(string_data_wrangled$num_ratings, 
+                                             max = max(string_data$num_ratings, 
                                                        na.rm = TRUE), 
                                              value = 1), 
                                  width = 6),
                              box(sliderInput(
                                'string_price', 
                                'Price Range ($)',
-                               min = min(string_data_wrangled$price_adjusted, 
+                               min = min(string_data$price_adjusted, 
                                          na.rm = TRUE),
-                               max = max(string_data_wrangled$price_adjusted,
+                               max = max(string_data$price_adjusted,
                                          na.rm = TRUE),
-                               value=c(min(string_data_wrangled$price_adjusted,
+                               value=c(min(string_data$price_adjusted,
                                            na.rm = TRUE),
-                                       max(string_data_wrangled$price_adjusted,
+                                       max(string_data$price_adjusted,
                                            na.rm = TRUE))),
                                checkboxInput('price_missing', 
                                              'Include strings with 
@@ -128,16 +128,16 @@ shinyUI(dashboardPage(
                                       box(sliderInput(
                                         'string_gauge_metric',
                                         'String Gauge - Metric (mm)',
-                                        min = min(string_data_wrangled$
+                                        min = min(string_data$
                                                     string_gauge_metric,
                                                   na.rm = TRUE),
-                                        max = max(string_data_wrangled$
+                                        max = max(string_data$
                                                     string_gauge_metric,
                                                   na.rm = TRUE),
-                                       value=c(min(string_data_wrangled$
+                                       value=c(min(string_data$
                                                      string_gauge_metric,
                                                    na.rm = TRUE),
-                                                       max(string_data_wrangled$
+                                                       max(string_data$
                                                              string_gauge_metric,
                                                            na.rm = TRUE))),
                                                checkboxInput('gauge_metric_missing',
@@ -151,13 +151,13 @@ shinyUI(dashboardPage(
                                       box(sliderInput(
                                        'string_gauge_us', 
                                        'String Gauge - US',
-                                       min = min(string_data_wrangled$string_gauge_us,
+                                       min = min(string_data$string_gauge_us,
                                                  na.rm = TRUE),
-                                       max = max(string_data_wrangled$string_gauge_us,
+                                       max = max(string_data$string_gauge_us,
                                                  na.rm = TRUE),
-                                       value=c(min(string_data_wrangled$string_gauge_us,
+                                       value=c(min(string_data$string_gauge_us,
                                                    na.rm = TRUE),
-                                               max(string_data_wrangled$string_gauge_us,
+                                               max(string_data$string_gauge_us,
                                                    na.rm = TRUE))),
                                        checkboxInput('gauge_us_missing',
                                                      'Include strings with no
@@ -178,16 +178,16 @@ shinyUI(dashboardPage(
                            #          box(sliderInput(
                            #            'string_gauge_metric', 
                            #            'String Gauge - Metric (mm)',
-                           #            min = min(string_data_wrangled$
+                           #            min = min(string_data$
                            #                        string_gauge_metric,
                            #                      na.rm = TRUE),
-                           #            max = max(string_data_wrangled$
+                           #            max = max(string_data$
                            #                        string_gauge_metric,
                            #                      na.rm = TRUE),
-                           #            value=c(min(string_data_wrangled$
+                           #            value=c(min(string_data$
                            #                          string_gauge_metric,
                            #                        na.rm = TRUE),
-                           #                    max(string_data_wrangled$
+                           #                    max(string_data$
                            #                          string_gauge_metric,
                            #                        na.rm = TRUE))),
                            #            checkboxInput('gauge_metric_missing',
@@ -200,13 +200,13 @@ shinyUI(dashboardPage(
                            #          box(sliderInput(
                            #            'string_gauge_us', 
                            #            'String Gauge - US',
-                           #            min = min(string_data_wrangled$string_gauge_us,
+                           #            min = min(string_data$string_gauge_us,
                            #                      na.rm = TRUE),
-                           #            max = max(string_data_wrangled$string_gauge_us,
+                           #            max = max(string_data$string_gauge_us,
                            #                      na.rm = TRUE),
-                           #            value=c(min(string_data_wrangled$string_gauge_us,
+                           #            value=c(min(string_data$string_gauge_us,
                            #                        na.rm = TRUE),
-                           #                    max(string_data_wrangled$string_gauge_us,
+                           #                    max(string_data$string_gauge_us,
                            #                        na.rm = TRUE))),
                            #            checkboxInput('gauge_us_missing',
                            #                          'Include strings with no
@@ -263,8 +263,8 @@ shinyUI(dashboardPage(
                              box(sliderInput(
                                'tester_minimum_reviews', 
                                'Minimum # of Reviews Written by Tester', 
-                               min = min(string_data_wrangled$tester_reviews), 
-                               max = max(string_data_wrangled$tester_reviews), 
+                               min = min(string_data$tester_reviews), 
+                               max = max(string_data$tester_reviews), 
                                value = 1),
                                width = 8)
                              ),
@@ -366,8 +366,8 @@ shinyUI(dashboardPage(
                              box(selectizeInput(
                                'racquet_manufacturer', 
                                'Tester Racquet Manufacturer(s)', 
-                               choices = sort(string_data_wrangled$racquet_manufacturer
-                                              [string_data_wrangled$racquet_manufacturer != '']),
+                               choices = sort(string_data$racquet_manufacturer
+                                              [string_data$racquet_manufacturer != '']),
                                multiple = TRUE,
                                options = list(placeholder = 
                                                 '(choose one or more)')),
@@ -385,7 +385,7 @@ shinyUI(dashboardPage(
                              box(selectizeInput(
                                'string_pattern',
                                'Tester String Pattern',
-                               choices = sort(string_data_wrangled$string_pattern),
+                               choices = sort(string_data$string_pattern),
                                multiple = TRUE,
                                options = list(placeholder = 
                                                 '(choose one or more)')),
