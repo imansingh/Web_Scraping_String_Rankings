@@ -1,44 +1,59 @@
 shinyUI(dashboardPage(
-  dashboardHeader(title = "Stringforum Project"),
+  dashboardHeader(title = "Tennis String Finder"),
   dashboardSidebar(
     sidebarUserPanel('Iman Singh',
-                     image = 'imansingh_headshot.jpg'
-                     ),
+                     image = 'imansingh_headshot.jpg'),
     sidebarMenu(
+      menuItem('App Info', tabName = 'info',
+               icon = icon('info-circle')),
       menuItem('Review Criteria', tabName = 'criteria', 
-               icon = icon('filter')
-               ),
+               icon = icon('filter')),
       menuItem('String Rankings', tabName = 'selector', 
-               icon = icon('sort')
-               ),
+               icon = icon('sort')),
       menuItem('String Profiles', tabName = 'string_profile', 
-               icon = icon('info-circle')
-               ),
+               icon = icon('search-plus')),
       br(),
       br(),
       br(),
       menuItem('About Iman:'),
       menuItem('Blog', icon = icon('wordpress'), 
-               href = 'https://nycdatascience.com/blog/author/imansingh/'
-               ),
+               href = 'https://nycdatascience.com/blog/author/imansingh/'),
       menuItem('LinkedIn', icon = icon('linkedin-square'), 
-               href = 'https://www.linkedin.com/in/imansingh/'
-               ),
+               href = 'https://www.linkedin.com/in/imansingh/'),
       menuItem('GitHub', icon = icon('github'), 
-               href = 'https://github.com/imansingh/Scraping-Project'
-               )
-      
+               href = 'https://github.com/imansingh/Scraping-Project')
     )
   ),
   dashboardBody(
     tabItems(
+      tabItem(tabName = 'info',
+              h1('Tennis String Finder'),
+              HTML('<h3>An app for helping  tennis players find the perfect string</h3>
+                   <br>
+                   Three steps to finding the right string: 
+                   <ol>
+                   <li>Use "Review Criteria" sidebar item to filter reviews, 
+                       keeping only the ones relevant to you. As you make 
+                       selections in the three input panels, the output table 
+                       will update. This filitered output table will be used for 
+                       rankings, so be sure to leave enough data for an accurate 
+                       analysis! </li>
+                   <br>
+                   <li>User inputs weights for desired and undesired string attributes, and ranks strings based on these weights.</li>
+                   <li>User views detailed review information about the highest ranked strings in order to select ones to test.</li>
+                   </ol>
+                   <br>
+                   (data was scraped from 
+                   <a href="https://www.stringforum.net/stringsearch.php">stringforum.net</a>)')
+              
+        
+        ),
       tabItem(tabName = 'criteria', 
               h2('Filter Which Reviews are Used for String Rankings and Profiles'),
               fluidRow(style = 'padding:15px',
                        h3('Select Your String Criteria, Tester Criteria, and 
                           Tester Racquet Criteria:'),
-                       h4('The table below will update based on your choices')
-                       ),
+                       h4('The table below will update based on your choices')),
               fluidRow(
                 tabBox(
                   id = 'criteriaInput', 
@@ -109,8 +124,7 @@ shinyUI(dashboardPage(
                              ),
                            fluidRow(
                              column(width = 4,
-                                    h4('String Gauge:')
-                                    ),
+                                    h4('String Gauge:')),
                              column(width = 4,
                                     box(radioButtons(
                                       'gauge_choice',
@@ -119,9 +133,7 @@ shinyUI(dashboardPage(
                                         'Metric Scale' = 'metric',
                                         'US Scale' = 'US'),
                                         selected = 'metric'),
-                                      width = NULL
-                                      )
-                                    ),
+                                      width = NULL)),
                              column(width = 4,
                                     conditionalPanel(
                                       'input.gauge_choice == "metric"',
@@ -144,8 +156,7 @@ shinyUI(dashboardPage(
                                                              'Include strings with no
                                                              gauge listed',
                                                              value = TRUE),
-                                       width = NULL)
-                                      ),
+                                       width = NULL)),
                                     conditionalPanel(
                                       'input.gauge_choice == "US"',
                                       box(sliderInput(
@@ -163,99 +174,47 @@ shinyUI(dashboardPage(
                                                      'Include strings with no
                                                      gauge listed',
                                                      value = TRUE),
-                                       width = NULL)
-                                      )
-                                    )
-                             ),
-                           #            
-                           # fluidRow(
-                           #   column(width = 4,
-                           #          h4('String Gauge:'), 'Select either
-                           #          Metric or US scale?'),
-                           #   
-                           # 
-                           #   column(width = 4,
-                           #          box(sliderInput(
-                           #            'string_gauge_metric', 
-                           #            'String Gauge - Metric (mm)',
-                           #            min = min(string_data$
-                           #                        string_gauge_metric,
-                           #                      na.rm = TRUE),
-                           #            max = max(string_data$
-                           #                        string_gauge_metric,
-                           #                      na.rm = TRUE),
-                           #            value=c(min(string_data$
-                           #                          string_gauge_metric,
-                           #                        na.rm = TRUE),
-                           #                    max(string_data$
-                           #                          string_gauge_metric,
-                           #                        na.rm = TRUE))),
-                           #            checkboxInput('gauge_metric_missing',
-                           #                          'Include strings with no
-                           #                          gauge listed',
-                           #                          value = TRUE),
-                           #            width = NULL)
-                           #          ),
-                           #   column(width = 4,
-                           #          box(sliderInput(
-                           #            'string_gauge_us', 
-                           #            'String Gauge - US',
-                           #            min = min(string_data$string_gauge_us,
-                           #                      na.rm = TRUE),
-                           #            max = max(string_data$string_gauge_us,
-                           #                      na.rm = TRUE),
-                           #            value=c(min(string_data$string_gauge_us,
-                           #                        na.rm = TRUE),
-                           #                    max(string_data$string_gauge_us,
-                           #                        na.rm = TRUE))),
-                           #            checkboxInput('gauge_us_missing',
-                           #                          'Include strings with no
-                           #                          gauge listed',
-                           #                          value = TRUE),
-                           #            width = NULL)
-                           #          )
-                           #   ),
-                           fluidRow(
-                             column(width = 4,
-                                    h4('String Adjectives (Include):'),
-                                    'Only include strings where one or more
-                                    reviewers listed these adjectives'),
-                             column(width = 8,
-                                    box(selectizeInput(
-                                      'string_adjectives_positive',
-                                      'Filter by Adjectives (Positive)',
-                                      choices = adjectives_list,
-                                      multiple = TRUE,
-                                      options = list(placeholder =
-                                                       '(choose one or more)')),
-                                      checkboxInput('adjectives_positive_missing', 
-                                                    'Include strings with no 
-                                                    adjectives listed',
-                                                    value = TRUE),
-                                      width = NULL)
-                                    )
-                             ),
-                           fluidRow(
-                             column(width = 4,
-                                    h4('String Adjectives (Exclude):'),
-                                    'Do not include any strings where a reviewer
-                                    listed these adjectives'),
-                             column(width = 8,
-                                    box(selectizeInput(
-                                      'string_adjectives_negative',
-                                      'Filter by Adjectives (Negative)',
-                                      choices = adjectives_list,
-                                      multiple = TRUE,
-                                      options = list(placeholder =
-                                                       '(choose one or more)')),
-                                      checkboxInput('adjectives_negative_missing', 
-                                                    'Include strings with no 
-                                                    adjectives listed',
-                                                    value = TRUE),
-                                      width = NULL)
-                                    )
+                                       width = NULL)))
                              )
-                           ),
+                  #          fluidRow(
+                  #            column(width = 4,
+                  #                   h4('String Adjectives (Include):'),
+                  #                   'Only include strings where one or more
+                  #                   reviewers listed these adjectives'),
+                  #            column(width = 8,
+                  #                   box(selectizeInput(
+                  #                     'string_adjectives_positive',
+                  #                     'Filter by Adjectives (Positive)',
+                  #                     choices = adjectives_list,
+                  #                     multiple = TRUE,
+                  #                     options = list(placeholder =
+                  #                                      '(choose one or more)')),
+                  #                     checkboxInput('adjectives_positive_missing', 
+                  #                                   'Include strings with no 
+                  #                                   adjectives listed',
+                  #                                   value = TRUE),
+                  #                     width = NULL))
+                  #            ),
+                  #          fluidRow(
+                  #            column(width = 4,
+                  #                   h4('String Adjectives (Exclude):'),
+                  #                   'Do not include any strings where a reviewer
+                  #                   listed these adjectives'),
+                  #            column(width = 8,
+                  #                   box(selectizeInput(
+                  #                     'string_adjectives_negative',
+                  #                     'Filter by Adjectives (Negative)',
+                  #                     choices = adjectives_list,
+                  #                     multiple = TRUE,
+                  #                     options = list(placeholder =
+                  #                                      '(choose one or more)')),
+                  #                     checkboxInput('adjectives_negative_missing', 
+                  #                                   'Include strings with no 
+                  #                                   adjectives listed',
+                  #                                   value = TRUE),
+                  #                     width = NULL))
+                  #            )
+                            ),
                   tabPanel("Tester Criteria",
                            h3('Only include reviews by testers with these 
                               characteristics:'),
