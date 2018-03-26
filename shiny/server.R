@@ -124,31 +124,31 @@ shinyServer(function(input, output){
         filter(string_gauge_us <= input$string_gauge_us[2])
     }
     
-    #string_adjectives_positive
-    if(!(is.null(input$string_adjectives_positive))){
-      matrix = sapply(input$string_adjectives_positive,
-                      function(string) 
-                        grepl(string, 
-                              string_data_filtered$string_adjectives))
-      if(input$adjectives_positive_missing){
-        matrix = cbind(matrix, 
-                       string_data_filtered$string_adjectives == '')
-      }
-      string_data_filtered = string_data_filtered[rowSums(matrix) > 0,]
-    }
-    
-    #string_adjectives_negative
-    if(!(is.null(input$string_adjectives_negative))){
-      matrix = sapply(input$string_adjectives_negative,
-                      function(string) 
-                        grepl(string, 
-                              string_data_filtered$string_adjectives))
-      if(!input$adjectives_negative_missing){
-        matrix = cbind(matrix, 
-                       string_data_filtered$string_adjectives == '')
-      }
-      string_data_filtered = string_data_filtered[rowSums(matrix) < 1,]
-    }
+    # #string_adjectives_positive
+    # if(!(is.null(input$string_adjectives_positive))){
+    #   matrix = sapply(input$string_adjectives_positive,
+    #                   function(string) 
+    #                     grepl(string, 
+    #                           string_data_filtered$string_adjectives))
+    #   if(input$adjectives_positive_missing){
+    #     matrix = cbind(matrix, 
+    #                    string_data_filtered$string_adjectives == '')
+    #   }
+    #   string_data_filtered = string_data_filtered[rowSums(matrix) > 0,]
+    # }
+    # 
+    # #string_adjectives_negative
+    # if(!(is.null(input$string_adjectives_negative))){
+    #   matrix = sapply(input$string_adjectives_negative,
+    #                   function(string) 
+    #                     grepl(string, 
+    #                           string_data_filtered$string_adjectives))
+    #   if(!input$adjectives_negative_missing){
+    #     matrix = cbind(matrix, 
+    #                    string_data_filtered$string_adjectives == '')
+    #   }
+    #   string_data_filtered = string_data_filtered[rowSums(matrix) < 1,]
+    # }
     
     # Filter based on tester criteria
     # tester_minimum_reviews
@@ -394,9 +394,9 @@ shinyServer(function(input, output){
                            'racquet manufacturer', 'racquet model',
                            'string pattern', 'frame size', 'main tension',
                            'cross tension'),
-              #extensions = list('ColReorder'), # , 'FixedColumns', 'Responsive'),
+              extensions = 'FixedColumns', # list('ColReorder', 'Responsive'),
               options = (list(scrollX = TRUE, scrollY=TRUE, #colReorder = TRUE,
-                              # fixedColumns = TRUE, 
+                              fixedColumns = list(leftColumns = 1), 
                               autoWidth = TRUE))) %>%
       formatCurrency('price_adjusted')
   })
@@ -451,54 +451,54 @@ shinyServer(function(input, output){
        # remove reviews with no adjectives listed
        filter(num_adjecs > 0) %>%
        # for each review get percentage of adjectives listed matching adjective
-       mutate(soft = soft / num_adjecs,
-              comfortable = comfortable / num_adjecs,
-              flexible = flexible / num_adjecs,
-              precise = precise / num_adjecs,
-              resilient = resilient / num_adjecs,
-              explosive = explosive / num_adjecs,
-              innovative = innovative / num_adjecs,
-              unique = unique / num_adjecs,
-              spongy = spongy / num_adjecs,
-              stiff = stiff / num_adjecs,
-              dull = dull / num_adjecs,
-              lively = lively / num_adjecs,
-              stretchy = stretchy / num_adjecs,
-              crispy = crispy / num_adjecs,
-              boring = boring / num_adjecs,
-              elastic = elastic / num_adjecs,
-              solid = solid / num_adjecs,
-              rough = rough / num_adjecs,
-              wire_like = wire_like / num_adjecs,
-              springy = springy / num_adjecs,
-              sluggish = sluggish / num_adjecs,
-              outdated = outdated / num_adjecs) %>%
+       # mutate(soft = soft / num_adjecs,
+       #        comfortable = comfortable / num_adjecs,
+       #        flexible = flexible / num_adjecs,
+       #        precise = precise / num_adjecs,
+       #        resilient = resilient / num_adjecs,
+       #        explosive = explosive / num_adjecs,
+       #        innovative = innovative / num_adjecs,
+       #        unique = unique / num_adjecs,
+       #        spongy = spongy / num_adjecs,
+       #        stiff = stiff / num_adjecs,
+       #        dull = dull / num_adjecs,
+       #        lively = lively / num_adjecs,
+       #        stretchy = stretchy / num_adjecs,
+       #        crispy = crispy / num_adjecs,
+       #        boring = boring / num_adjecs,
+       #        elastic = elastic / num_adjecs,
+       #        solid = solid / num_adjecs,
+       #        rough = rough / num_adjecs,
+       #        wire_like = wire_like / num_adjecs,
+       #        springy = springy / num_adjecs,
+       #        sluggish = sluggish / num_adjecs,
+       #        outdated = outdated / num_adjecs) %>%
        # group reviews by string name
        group_by(string_name) %>%
        # for each string get # adjective reviews and mean % of each adjective
        summarise(num_adjec_reviews = n(),
-                 soft = mean(soft),
-                 comfortable = mean(comfortable),
-                 flexible = mean(flexible),
-                 precise = mean (precise),
-                 resilient = mean(resilient),
-                 explosive = mean(explosive),
-                 innovative = mean(innovative),
-                 unique = mean(unique),
-                 spongy = mean(spongy),
-                 stiff = mean(stiff),
-                 dull = mean(dull),
-                 lively = mean(lively),
-                 stretchy  = mean(stretchy),
-                 crispy = mean(crispy),
-                 boring = mean(boring),
-                 elastic = mean(elastic),
-                 solid = mean(solid),
-                 rough = mean(rough),
-                 wire_like = mean(wire_like),
-                 springy = mean(springy),
-                 sluggish = mean(sluggish),
-                 outdated = mean(outdated)) %>%
+                 soft = sum(soft, na.rm = TRUE) * 100 / num_adjec_reviews,
+                 comfortable = sum(comfortable, na.rm = TRUE) * 100 / num_adjec_reviews,
+                 flexible = sum(flexible, na.rm = TRUE) * 100 / num_adjec_reviews,
+                 precise = sum(precise, na.rm = TRUE) * 100 / num_adjec_reviews,
+                 resilient = sum(resilient, na.rm = TRUE) * 100 / num_adjec_reviews,
+                 explosive = sum(explosive, na.rm = TRUE) * 100 / num_adjec_reviews,
+                 innovative = sum(innovative, na.rm = TRUE) * 100 / num_adjec_reviews,
+                 unique = sum(unique, na.rm = TRUE) * 100 / num_adjec_reviews,
+                 spongy = sum(spongy, na.rm = TRUE) * 100 / num_adjec_reviews,
+                 stiff = sum(stiff, na.rm = TRUE) * 100 / num_adjec_reviews,
+                 dull = sum(dull, na.rm = TRUE) * 100 / num_adjec_reviews,
+                 lively = sum(lively, na.rm = TRUE) * 100 / num_adjec_reviews,
+                 stretchy  = sum(stretchy, na.rm = TRUE) * 100 / num_adjec_reviews,
+                 crispy = sum(crispy, na.rm = TRUE) * 100 / num_adjec_reviews,
+                 boring = sum(boring, na.rm = TRUE) * 100 / num_adjec_reviews,
+                 elastic = sum(elastic, na.rm = TRUE) * 100 / num_adjec_reviews,
+                 solid = sum(solid, na.rm = TRUE) * 100 / num_adjec_reviews,
+                 rough = sum(rough, na.rm = TRUE) * 100 / num_adjec_reviews,
+                 wire_like = sum(wire_like, na.rm = TRUE) * 100 / num_adjec_reviews,
+                 springy = sum(springy, na.rm = TRUE) * 100 / num_adjec_reviews,
+                 sluggish = sum(sluggish, na.rm = TRUE) * 100 / num_adjec_reviews,
+                 outdated = sum(outdated, na.rm = TRUE) * 100 / num_adjec_reviews) %>%
        # multiply means by user input to get weighted means, then sum for score 
        mutate(adjectives_score = 
                 soft * input$soft +
@@ -691,9 +691,9 @@ shinyServer(function(input, output){
                               'control', 'durability', 'feel', 
                               'power', 'spin', 'tension stab', 
                               'satisfaction', 'characteristics score'),
-                 #extensions = list('ColReorder'), #, 'FixedColumns', 'Responsive'),
+                 extensions = 'FixedColumns', # list('ColReorder', 'Responsive'),
                  options = (list(scrollX = TRUE, scrollY=TRUE, #colReorder = TRUE,
-                                 # fixedColumns = TRUE, 
+                                 fixedColumns = list(leftColumns = 2), 
                                  autoWidth = TRUE))) %>%
          formatRound(columns = c('comfort', 'control', 'durability', 'feel', 
                                  'power', 'spin', 'tension_stab', 
@@ -719,7 +719,7 @@ shinyServer(function(input, output){
                      backgroundColor = styleInterval(brks_characteristics, clrs))
      } else if(input$table_choice == 'adjectives'){
        datatable(selector_table_adjectives, rownames=TRUE,
-                 # extensions = list('ColReorder'), #, 'FixedColumns', 'Responsive'),
+                 extensions = 'FixedColumns', # list('ColReorder', 'Responsive'),
                  colnames = c('string name', '# reviews (adj)','soft', 'comfortable', 'flexible', 'precise', 
                               'resilient', 'explosive', 'innovative', 'unique', 
                               'spongy', 'stiff', 'dull', 'lively', 'stretchy', 
@@ -727,7 +727,7 @@ shinyServer(function(input, output){
                               'wire-like', 'springy', 'sluggish', 'outdated', 
                               'adjectives score'),
                  options = (list(scrollX = TRUE, scrollY=TRUE, #colReorder = TRUE,
-                                 # fixedColumns = TRUE, 
+                                 fixedColumns = list(leftColumns = 2), 
                                  autoWidth = TRUE))) %>%
        formatRound(columns = c('soft', 'comfortable', 'flexible', 'precise', 
                                'resilient', 'explosive', 'innovative', 'unique', 
@@ -804,9 +804,9 @@ shinyServer(function(input, output){
                               'crispy', 'boring', 'elastic', 'solid', 'rough', 
                               'wire-like', 'springy', 'sluggish', 'outdated', 
                               'adjectives score', 'combined score'),
-                 #extensions = list('ColReorder'), #, 'FixedColumns', 'Responsive'),
+                 extensions = 'FixedColumns',  #list('ColReorder', 'Responsive'),
                  options = (list(scrollX = TRUE, scrollY=TRUE, #colReorder = TRUE,
-                                 # fixedColumns = TRUE, 
+                                 fixedColumns = list(leftColumns = 2),
                                  autoWidth = TRUE))) %>%
            formatRound(columns = c('comfort', 'control', 'durability', 'feel',
                                    'power', 'spin', 'tension_stab', 
@@ -947,10 +947,11 @@ shinyServer(function(input, output){
                            'racquet manufacturer', 'racquet model',
                            'string pattern', 'frame size', 'main tension',
                            'cross tension'),
-              #extensions = list('ColReorder'), # , 'FixedColumns', 'Responsive'),
+              extensions =  'FixedColumns', #list('ColReorder', 'Responsive'),
               options = (list(scrollX = TRUE, scrollY=TRUE, #colReorder = TRUE,
                               # fixedColumns = TRUE, 
                               autoWidth = TRUE,
+                              fixedColumns = list(leftColumns = 2),
                               columnDefs = list(list(width = '400px',
                                                      targets = 2))
                               ))) %>% 
@@ -1225,16 +1226,15 @@ shinyServer(function(input, output){
                                       round(characteristics_full_z, 2)) 
     
     datatable(characteristics_analysis_df, rownames=FALSE,
-              caption = 'selected sample = what is selected in search criteria',
               colnames = c('characteristics', 'avg score - selected string', 
                            'avg score - selected sample', 'percentile - string within sample',
                            'z score - string within sample', 'avg score - all reviews',
                            'percentile - all reviews', 'z score - all reviews'),
-              #extensions = list('ColReorder'), #, 'FixedColumns', 'Responsive'),
+              extensions = 'FixedColumns', #list('ColReorder', 'Responsive'),
               options = (list(scrollX = TRUE, scrollY=TRUE, paging = FALSE,
                               #colReorder = TRUE,
-                              # fixedColumns = TRUE, 
-                              autoWidth = TRUE)))  %>%
+                             fixedColumns = list(leftColumns = 1), 
+                             autoWidth = TRUE)))  %>%
       # formatRound(columns = c('comfort', 'control', 'durability', 'feel',
       #                         'power', 'spin', 'tension_stab', 
       #                         'satisfaction', 'characteristics_score',
@@ -1316,97 +1316,97 @@ shinyServer(function(input, output){
     #   (sum(vec == str, na.rm = TRUE) / nrow(df)) * 100
     # }
     
-    # test = string_data %>%
-    #   mutate(dull_pct = 
-    #            sum(unlist(string_data %>%
-    #                         filter(string_name == string_data$string_name) %>% 
-    #                         pull(string_adjectives)) == 'dull', na.rm = TRUE) / 
-    #            nrow(string_data %>%
-    #                   filter(string_name == 'Luxilon Big Banger Alu Power 16L')) * 100)
-    # test
-    
-    adjectives_string_means = 
-      c(mean(get_string_data_specific()$soft, na.rm = TRUE),
-        mean(get_string_data_specific()$comfortable, na.rm = TRUE),
-        mean(get_string_data_specific()$flexible, na.rm = TRUE),
-        mean(get_string_data_specific()$precise, na.rm = TRUE),
-        mean(get_string_data_specific()$resilient, na.rm = TRUE),
-        mean(get_string_data_specific()$explosive, na.rm = TRUE),
-        mean(get_string_data_specific()$innovative, na.rm = TRUE),
-        mean(get_string_data_specific()$unique, na.rm = TRUE),
-        mean(get_string_data_specific()$spongy, na.rm = TRUE),
-        mean(get_string_data_specific()$stiff, na.rm = TRUE),
-        mean(get_string_data_specific()$dull, na.rm = TRUE),
-        mean(get_string_data_specific()$lively, na.rm = TRUE),
-        mean(get_string_data_specific()$stretchy, na.rm = TRUE),
-        mean(get_string_data_specific()$crispy, na.rm = TRUE),
-        mean(get_string_data_specific()$boring, na.rm = TRUE),
-        mean(get_string_data_specific()$elastic, na.rm = TRUE),
-        mean(get_string_data_specific()$solid, na.rm = TRUE),
-        mean(get_string_data_specific()$rough, na.rm = TRUE),
-        mean(get_string_data_specific()$wire_like, na.rm = TRUE),
-        mean(get_string_data_specific()$springy, na.rm = TRUE),
-        mean(get_string_data_specific()$sluggish, na.rm = TRUE),
-        mean(get_string_data_specific()$outdated, na.rm = TRUE)
-        )
-    
-    adjectives_sample_means_df = get_string_data_filtered() %>%
+    adjectives_string_means_df = get_string_data_specific() %>%
+      # remove reviews with no adjectives listed
+      filter(num_adjecs > 0) %>%
       group_by(string_name) %>%
-      summarise(
-        soft = mean(soft, na.rm = TRUE),
-        comfortable = mean(comfortable, na.rm = TRUE),
-        flexible = mean(flexible, na.rm = TRUE),
-        precise = mean(precise, na.rm = TRUE),
-        resilient = mean(resilient, na.rm = TRUE),
-        explosive = mean(explosive, na.rm = TRUE),
-        innovative = mean(innovative, na.rm = TRUE),
-        unique = mean(unique, na.rm = TRUE),
-        spongy = mean(spongy, na.rm = TRUE),
-        stiff = mean(stiff, na.rm = TRUE),
-        dull = mean(dull, na.rm = TRUE),
-        lively = mean(lively, na.rm = TRUE),
-        stretchy = mean(stretchy, na.rm = TRUE),
-        crispy = mean(crispy, na.rm = TRUE),
-        boring = mean(boring, na.rm = TRUE),
-        elastic = mean(elastic, na.rm = TRUE),
-        solid = mean(solid, na.rm = TRUE),
-        rough = mean(rough, na.rm = TRUE),
-        wire_like = mean(wire_like, na.rm = TRUE),
-        springy = mean(springy, na.rm = TRUE),
-        sluggish = mean(sluggish, na.rm = TRUE),
-        outdated = mean(outdated, na.rm = TRUE)
-        )
+      # for each string get # adjective reviews and mean % of each adjective
+      summarise(soft = sum(soft, na.rm = TRUE) * 100 / n(),
+                comfortable = sum(comfortable, na.rm = TRUE) * 100 / n(),
+                flexible = sum(flexible, na.rm = TRUE) * 100 / n(),
+                precise = sum(precise, na.rm = TRUE) * 100 / n(),
+                resilient = sum(resilient, na.rm = TRUE) * 100 / n(),
+                explosive = sum(explosive, na.rm = TRUE) * 100 / n(),
+                innovative = sum(innovative, na.rm = TRUE) * 100 / n(),
+                unique = sum(unique, na.rm = TRUE) * 100 / n(),
+                spongy = sum(spongy, na.rm = TRUE) * 100 / n(),
+                stiff = sum(stiff, na.rm = TRUE) * 100 / n(),
+                dull = sum(dull, na.rm = TRUE) * 100 / n(),
+                lively = sum(lively, na.rm = TRUE) * 100 / n(),
+                stretchy  = sum(stretchy, na.rm = TRUE) * 100 / n(),
+                crispy = sum(crispy, na.rm = TRUE) * 100 / n(),
+                boring = sum(boring, na.rm = TRUE) * 100 / n(),
+                elastic = sum(elastic, na.rm = TRUE) * 100 / n(),
+                solid = sum(solid, na.rm = TRUE) * 100 / n(),
+                rough = sum(rough, na.rm = TRUE) * 100 / n(),
+                wire_like = sum(wire_like, na.rm = TRUE) * 100 / n(),
+                springy = sum(springy, na.rm = TRUE) * 100 / n(),
+                sluggish = sum(sluggish, na.rm = TRUE) * 100 / n(),
+                outdated = sum(outdated, na.rm = TRUE) * 100 / n())
+    
+    # get mean for each characteristic (df is grouped, so mean of strings not reviews)
+    adjectives_string_means = 
+      colMeans(adjectives_string_means_df[,2:23], na.rm = TRUE)
+  
+    adjectives_sample_means_df = get_string_data_filtered() %>%
+      # remove reviews with no adjectives listed
+      filter(num_adjecs > 0) %>%
+      group_by(string_name) %>%
+      # for each string get # adjective reviews and mean % of each adjective
+      summarise(soft = sum(soft, na.rm = TRUE) * 100 / n(),
+                comfortable = sum(comfortable, na.rm = TRUE) * 100 / n(),
+                flexible = sum(flexible, na.rm = TRUE) * 100 / n(),
+                precise = sum(precise, na.rm = TRUE) * 100 / n(),
+                resilient = sum(resilient, na.rm = TRUE) * 100 / n(),
+                explosive = sum(explosive, na.rm = TRUE) * 100 / n(),
+                innovative = sum(innovative, na.rm = TRUE) * 100 / n(),
+                unique = sum(unique, na.rm = TRUE) * 100 / n(),
+                spongy = sum(spongy, na.rm = TRUE) * 100 / n(),
+                stiff = sum(stiff, na.rm = TRUE) * 100 / n(),
+                dull = sum(dull, na.rm = TRUE) * 100 / n(),
+                lively = sum(lively, na.rm = TRUE) * 100 / n(),
+                stretchy  = sum(stretchy, na.rm = TRUE) * 100 / n(),
+                crispy = sum(crispy, na.rm = TRUE) * 100 / n(),
+                boring = sum(boring, na.rm = TRUE) * 100 / n(),
+                elastic = sum(elastic, na.rm = TRUE) * 100 / n(),
+                solid = sum(solid, na.rm = TRUE) * 100 / n(),
+                rough = sum(rough, na.rm = TRUE) * 100 / n(),
+                wire_like = sum(wire_like, na.rm = TRUE) * 100 / n(),
+                springy = sum(springy, na.rm = TRUE) * 100 / n(),
+                sluggish = sum(sluggish, na.rm = TRUE) * 100 / n(),
+                outdated = sum(outdated, na.rm = TRUE) * 100 / n())
     
     # get mean for each characteristic (df is grouped, so mean of strings not reviews)
     adjectives_sample_means = 
       colMeans(adjectives_sample_means_df[,2:23], na.rm = TRUE)
     
     adjectives_full_means_df = string_data %>%
+      # remove reviews with no adjectives listed
+      filter(num_adjecs > 0) %>%
       group_by(string_name) %>%
-      summarise(
-        soft = mean(soft, na.rm = TRUE),
-        comfortable = mean(comfortable, na.rm = TRUE),
-        flexible = mean(flexible, na.rm = TRUE),
-        precise = mean(precise, na.rm = TRUE),
-        resilient = mean(resilient, na.rm = TRUE),
-        explosive = mean(explosive, na.rm = TRUE),
-        innovative = mean(innovative, na.rm = TRUE),
-        unique = mean(unique, na.rm = TRUE),
-        spongy = mean(spongy, na.rm = TRUE),
-        stiff = mean(stiff, na.rm = TRUE),
-        dull = mean(dull, na.rm = TRUE),
-        lively = mean(lively, na.rm = TRUE),
-        stretchy = mean(stretchy, na.rm = TRUE),
-        crispy = mean(crispy, na.rm = TRUE),
-        boring = mean(boring, na.rm = TRUE),
-        elastic = mean(elastic, na.rm = TRUE),
-        solid = mean(solid, na.rm = TRUE),
-        rough = mean(rough, na.rm = TRUE),
-        wire_like = mean(wire_like, na.rm = TRUE),
-        springy = mean(springy, na.rm = TRUE),
-        sluggish = mean(sluggish, na.rm = TRUE),
-        outdated = mean(outdated, na.rm = TRUE)
-      )
+      # for each string get # adjective reviews and mean % of each adjective
+      summarise(soft = sum(soft, na.rm = TRUE) * 100 / n(),
+                comfortable = sum(comfortable, na.rm = TRUE) * 100 / n(),
+                flexible = sum(flexible, na.rm = TRUE) * 100 / n(),
+                precise = sum(precise, na.rm = TRUE) * 100 / n(),
+                resilient = sum(resilient, na.rm = TRUE) * 100 / n(),
+                explosive = sum(explosive, na.rm = TRUE) * 100 / n(),
+                innovative = sum(innovative, na.rm = TRUE) * 100 / n(),
+                unique = sum(unique, na.rm = TRUE) * 100 / n(),
+                spongy = sum(spongy, na.rm = TRUE) * 100 / n(),
+                stiff = sum(stiff, na.rm = TRUE) * 100 / n(),
+                dull = sum(dull, na.rm = TRUE) * 100 / n(),
+                lively = sum(lively, na.rm = TRUE) * 100 / n(),
+                stretchy  = sum(stretchy, na.rm = TRUE) * 100 / n(),
+                crispy = sum(crispy, na.rm = TRUE) * 100 / n(),
+                boring = sum(boring, na.rm = TRUE) * 100 / n(),
+                elastic = sum(elastic, na.rm = TRUE) * 100 / n(),
+                solid = sum(solid, na.rm = TRUE) * 100 / n(),
+                rough = sum(rough, na.rm = TRUE) * 100 / n(),
+                wire_like = sum(wire_like, na.rm = TRUE) * 100 / n(),
+                springy = sum(springy, na.rm = TRUE) * 100 / n(),
+                sluggish = sum(sluggish, na.rm = TRUE) * 100 / n(),
+                outdated = sum(outdated, na.rm = TRUE) * 100 / n())
     
     # get mean for each characteristic (df is grouped, so mean of strings not reviews)
     adjectives_full_means = 
@@ -1607,31 +1607,30 @@ shinyServer(function(input, output){
     
     adjectives_analysis_df = 
       data.frame(adjectives_list,
-                 adjectives_string_means,
-                 adjectives_sample_means,
+                 adjectives_string_means = round(adjectives_string_means, 1),
+                 adjectives_sample_means= round(adjectives_sample_means, 1),
                  adjectives_sample_percentile = 
                    round(adjectives_sample_percentile, 1),
                  adjectives_sample_z = round(adjectives_sample_z, 2),
-                 adjectives_full_means,
+                 adjectives_full_means = round(adjectives_full_means, 1),
                  adjectives_full_percentile = 
                    round(adjectives_full_percentile, 1),
                  adjectives_full_z = round(adjectives_full_z, 2)) %>%
       arrange(desc(adjectives_string_means))
     
     datatable(adjectives_analysis_df, rownames=FALSE,
-              caption = 'selected sample = what is selected in search criteria',
               colnames = c('adjectives', 'prevalence - selected string', 
                            'prevalence - selected sample', 'percentile - string within sample',
                            'z score - string within sample', 'prevalence - all reviews',
                            'percentile - all reviews', 'z score - all reviews'),
-              #extensions = list('ColReorder'), #, 'FixedColumns', 'Responsive'),
+              extensions = 'FixedColumns', # list('ColReorder', 'Responsive'),
               options = (list(scrollX = TRUE, scrollY=TRUE, paging = FALSE,
                               #colReorder = TRUE,
-                              # fixedColumns = TRUE, 
+                              fixedColumns = list(leftColumns = 1), 
                               autoWidth = TRUE)))  %>%
-      formatPercentage(columns = c('adjectives_string_means', 
-                                   'adjectives_sample_means', 
-                                   'adjectives_full_means'), digits = 1) %>%
+      # formatPercentage(columns = c('adjectives_string_means', 
+      #                              'adjectives_sample_means', 
+      #                              'adjectives_full_means'), digits = 1) %>%
       # formatStyle(columns = 'adjective_pct_string_means',
       #             backgroundColor = styleInterval(brks_adj_string_means, clrs)) %>%
       # formatStyle(columns = 'adjective_pct_sample_means',

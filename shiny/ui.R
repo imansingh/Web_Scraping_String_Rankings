@@ -28,23 +28,36 @@ shinyUI(dashboardPage(
     tabItems(
       tabItem(tabName = 'info',
               h1('Tennis String Finder'),
-              HTML('<h3>An app for helping  tennis players find the perfect string</h3>
-                   <br>
+              HTML('<h3>An App for Helping  Tennis Players Find the Perfect 
+                        String</h3>
+                   <br> <h4>
                    Three steps to finding the right string: 
+                   <br><br>
                    <ol>
                    <li>Use "Review Criteria" sidebar item to filter reviews, 
                        keeping only the ones relevant to you. As you make 
                        selections in the three input panels, the output table 
-                       will update. This filitered output table will be used for 
+                       will update. This filtered output table will be used for 
                        rankings, so be sure to leave enough data for an accurate 
                        analysis! </li>
                    <br>
-                   <li>User inputs weights for desired and undesired string attributes, and ranks strings based on these weights.</li>
-                   <li>User views detailed review information about the highest ranked strings in order to select ones to test.</li>
-                   </ol>
+                   <li>Use "String Rankings" sidebar item to rank strings based
+                       on your preferred weights for string characteristics and 
+                       adjectives.</li>
                    <br>
-                   (data was scraped from 
-                   <a href="https://www.stringforum.net/stringsearch.php">stringforum.net</a>)')
+                   <li>Use "String Profile" sidebar item to view detailed review 
+                       information about the top ranked strings, in order to 
+                       select ones to test (and, after testing, write a review 
+                       on stringforum with your evaluation).</li>
+                   </ol> </h4>
+                   <br> <br>
+                   For more information about this app and the string finder 
+                   concept, see my 
+                   <a href="https://nycdatascience.com/blog/student-works/web-scraping-building-an-app-to-find-the-perfect-tennis-string/">
+                      blog post</a>.
+                   <br>
+                   Data for this app were scraped from 
+                   <a href="https://www.stringforum.net/stringsearch.php">stringforum.net</a>')
               
         
         ),
@@ -60,8 +73,8 @@ shinyUI(dashboardPage(
                   width = 12,
                   selected = 'String Criteria',
                   tabPanel('String Criteria',
-                           h3('Only include strings with these 
-                              characteristics:'),
+                           h4('Only include strings with these 
+                              attributes:'),
                            fluidRow(
                              box(sliderInput('string_minimum_reviews', 
                                              'Minimum # of Total Reviews', 
@@ -216,8 +229,8 @@ shinyUI(dashboardPage(
                   #            )
                             ),
                   tabPanel("Tester Criteria",
-                           h3('Only include reviews by testers with these 
-                              characteristics:'),
+                           h4('Only include reviews by testers with these 
+                              attributes:'),
                            fluidRow(
                              box(sliderInput(
                                'tester_minimum_reviews', 
@@ -319,7 +332,7 @@ shinyUI(dashboardPage(
                              )
                            ),
                   tabPanel("Tester Racquet Criteria",
-                           h3('Only include reviews by testers using these 
+                           h4('Only include reviews by testers using these 
                               types of racquets:'),
                            fluidRow( 
                              box(selectizeInput(
@@ -397,8 +410,44 @@ shinyUI(dashboardPage(
                                              value = TRUE),
                                width = 4)
                              )
+                           ),
+                  tabPanel("Reference",
+                           HTML('<ul>
+                                    <li><strong>Price:</strong> prices listed in 
+                                        Euros were converted to US Dollars at 
+                                        exchange rate of 1 EUR to 1.24 USD
+                                    </li> <br>
+                                    <li><strong>Gauge:</strong> 
+                                        US/Metric coversions made 
+                                        according to the official USRSA chart on
+                                        <a href="http://www.tennis-warehouse.com/LC/StringReference.html">this page</a>
+                                        Note that the ranges overlap. When converting from US 
+                                        to metric, mean value of range was used. <br> <br>
+                                        Because of the overlap, I could not use
+                                        the chart as when converting from 
+                                        metric to US. Instead, I used these
+                                        ranges:
+                                        <ul>
+                                            <li>US 15 = Metric >= 1.34 & <= 1.49)</li>
+                                            <li>US 16 = Metric >= 1.23 & <= 1.33)</li>
+                                            <li>US 17 = Metric >= 1.16 & <= 1.22)</li>
+                                            <li>US 18 = Metric >= 1.06 & <= 1.15)</li>
+                                            <li>US 19 = Metric >= .9 & <= 1.05)</li>
+                                        </ul> <br>
+                                        To make US gauges into numeric values,
+                                        compatible with the slider input, I 
+                                        dropped the "L" when it was present.
+                                    </li> <br>
+                                    <li><strong>Tester Attributes:</strong> All
+                                        tester attributes are self-reported by
+                                        reviewers, and there are no guidelines 
+                                        given on the website
+                                    </li>
+                                </ul>'
                            )
+                    )
                   )
+                
                 ),
               fluidRow(style = 'padding:15px',
                        h3(textOutput('criteria_table_title'))),
@@ -416,7 +465,7 @@ shinyUI(dashboardPage(
                   width = 12,
                   selected = 'String Characteristics',
                   tabPanel('String Characteristics',
-                           h3('Select how important these factors are to you,
+                           h4('Select how important these characteristics are to you,
                               on a scale of 0-10:'),
                            fluidRow(
                              box(sliderInput('string_comfort', 'Comfort',
@@ -450,7 +499,7 @@ shinyUI(dashboardPage(
                              )
                            ),
                   tabPanel("String Adjectives",
-                           h3('Select whether you like or dislike these types
+                           h4('Select whether you like or dislike these types
                               of strings:'),
                            'Scale:',
                            HTML('&emsp;'), '+2 = Strongly Like,',
@@ -532,6 +581,59 @@ shinyUI(dashboardPage(
                                              min = -2, max = 2, value = 0),
                                  width = 2)
                              )
+                           ),
+                  tabPanel("Reference",
+                           HTML('<ul>
+                                 <li> <strong> # Reviews (ch): </strong> 
+                                    Number of reviews for the string with at
+                                    least one characteristic rated
+                                </li> <br>
+                                <li> <strong> Characteristics Scores: </strong> 
+                                    % of maximum possible score for that characteristic 
+                                    <br>
+                                    A score of 50 can be interpreted 
+                                    as: "Taking into account only the
+                                    reviews where the string was rated for this 
+                                    characteristic, the string received exactly 
+                                    50% of the maximum possible rating"
+                                </li> <br>
+                                <li> <strong> Overall Characteristics Score: </strong> 
+                                    The weighted average of
+                                    all the individual characteristics scores,
+                                    with weights input by user. By default, all
+                                    characteristics get equal weight (5)
+                                </li> <br>
+                                <li> <strong> # Reviews (adj): </strong> 
+                                    Number of reviews for the string with at
+                                    least one adjective selected
+                                </li> <br>
+                                <li> <strong> Adjectives Scores: </strong> 
+                                    % of reviews selecting the adjective 
+                                    <br> 
+                                    A score of 50 can be interpreted as: "Taking 
+                                    into account only the reviews where at least 
+                                    one adjective was selected, exactly 50% of 
+                                    the reviews for the string included this 
+                                    adjective."
+                                </li> <br>
+                                <li> <strong> Overall Adjectives Score: </strong> 
+                                    The weighted average of
+                                    all the individual adjectives scores,
+                                    with weights input by user. No adjectives 
+                                    count toward overall score unless user 
+                                    changes the weight (default weights are 0)
+                                </li> <br>
+                                <li> <strong> Cell Background Colors: </strong>
+                                    Colored according to 
+                                    percentile within filtered dataset, 
+                                    in 5% increments. If the score is above the 
+                                    55th percentile for a metric, its cell will 
+                                    be green. If it’s below the 45th percentile, 
+                                    its cell will be red. The middle percentiles 
+                                    are white, and shades of color get darker 
+                                    toward the extremes
+                                </li> <br>
+                                </ul>')
                            )
                   )),
               fluidRow(style = 'padding:15px',
@@ -641,10 +743,32 @@ shinyUI(dashboardPage(
                   tabPanel('Adjectives Analysis',
                            box(DT::dataTableOutput('adjectives_analysis_table'), 
                                width = NULL)
-                           )
+                           ),
                   # tabPanel('Adjectives Plot',
                   #          box('Adjectives Plot'), width = NULL
                   #          )
+                  tabPanel("Reference",
+                           HTML('<ul>
+                                <li> <strong> Characteristics Scores: </strong> 
+                                % of maximum possible score for that characteristic 
+                                <br>
+                                A score of 50 can be interpreted 
+                                as: "Taking into account only the
+                                reviews that contain ratings for this 
+                                characteristic, strings in the sample received 
+                                exactly 50% of the maximum possible rating"
+                                </li> <br>
+                                <li> <strong> Adjectives Scores: </strong> 
+                                % of reviews selecting the adjective 
+                                <br> 
+                                A score of 50 can be interpreted as: "Taking 
+                                into account only the reviews where at least 
+                                one adjective was selected, exactly 50% of 
+                                reviews in the sample included this 
+                                adjective."
+                                </li> <br>
+                                </ul>')
+                           )
                   )
                 )
               )
