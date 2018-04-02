@@ -344,14 +344,14 @@ shinyUI(dashboardPage(
                                options = list(placeholder = 
                                                 '(choose one or more)')),
                                checkboxInput('manufacturer_missing', 
-                                             'Include reviews for racquets with 
-                                              no manufacturer listed',
+                                             'Include reviews with 
+                                              no racquet manufacturer listed',
                                              value = TRUE),
                                width = 4),
                              box(uiOutput('racquet_model_list'),
                                checkboxInput('model_missing',
-                                             'Include reviews for racquets with
-                                              no model listed',
+                                             'Include reviews with
+                                              no racquet model listed',
                                              value = TRUE),
                                width = 4),
                              box(selectizeInput(
@@ -362,7 +362,7 @@ shinyUI(dashboardPage(
                                options = list(placeholder = 
                                                 '(choose one or more)')),
                                checkboxInput('pattern_missing', 
-                                             'Include reviews for racquets with 
+                                             'Include reviews with 
                                               no string pattern listed',
                                              value = TRUE),
                                width = 4)
@@ -395,7 +395,7 @@ shinyUI(dashboardPage(
                                min = 35, max = 75, value = c(35,75),
                                round = TRUE),
                                checkboxInput('main_missing', 
-                                             'Include reviews for racquets with 
+                                             'Include reviews with 
                                              no main tension listed',
                                              value = TRUE),
                                width = 4),
@@ -405,7 +405,7 @@ shinyUI(dashboardPage(
                                min = 35, max = 75, value = c(35,75),
                                round = TRUE),
                                checkboxInput('cross_missing', 
-                                             'Include reviews for racquets with 
+                                             'Include reviews with 
                                               no cross tension listed',
                                              value = TRUE),
                                width = 4)
