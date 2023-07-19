@@ -39,15 +39,15 @@ class StringforumSpider(Spider):
 		except:
 			price = "Unkown"
 
-		overall_durability = response.xpath('//table[@cellpadding="1"]//tr[3]//td[@class="b"][1]/img[@src = "grsq8.gif"]/@width').extract_first()
-		overall_power = response.xpath('//table[@cellpadding="1"]//tr[3]//td[@class="b"][2]/img[@src = "grsq8.gif"]/@width').extract_first()
-		overall_control = response.xpath('//table[@cellpadding="1"]//tr[3]//td[@class="b"][3]/img[@src = "grsq8.gif"]/@width').extract_first()
-		overall_feel = response.xpath('//table[@cellpadding="1"]//tr[3]//td[@class="b"][4]/img[@src = "grsq8.gif"]/@width').extract_first()
-		overall_comfort = response.xpath('//table[@cellpadding="1"]//tr[3]//td[@class="b"][5]/img[@src = "grsq8.gif"]/@width').extract_first()
-		overall_spin = response.xpath('//table[@cellpadding="1"]//tr[3]//td[@class="b"][6]/img[@src = "grsq8.gif"]/@width').extract_first()
-		overall_tension_stability = response.xpath('//table[@cellpadding="1"]//tr[3]//td[@class="b"][7]/img[@src = "grsq8.gif"]/@width').extract_first()
+		overall_durability = response.xpath('//table[@cellpadding="1"]//tr[3]//td[@class="b"][1]/img[@src="grsq8.gif" or @src="redsq8.gif" or @src="grysq8.gif"]/@width').extract_first()
+		overall_power = response.xpath('//table[@cellpadding="1"]//tr[3]//td[@class="b"][2]/img[@src="grsq8.gif" or @src="redsq8.gif" or @src="grysq8.gif"]/@width').extract_first()
+		overall_control = response.xpath('//table[@cellpadding="1"]//tr[3]//td[@class="b"][3]/img[@src="grsq8.gif" or @src="redsq8.gif" or @src="grysq8.gif" or @src = "redsq8.gif"]/@width').extract_first()
+		overall_feel = response.xpath('//table[@cellpadding="1"]//tr[3]//td[@class="b"][4]/img[@src="grsq8.gif" or @src="redsq8.gif" or @src="grysq8.gif"]/@width').extract_first()
+		overall_comfort = response.xpath('//table[@cellpadding="1"]//tr[3]//td[@class="b"][5]/img[@src="grsq8.gif" or @src="redsq8.gif" or @src="grysq8.gif"]/@width').extract_first()
+		overall_spin = response.xpath('//table[@cellpadding="1"]//tr[3]//td[@class="b"][6]/img[@src="grsq8.gif" or @src="redsq8.gif" or @src="grysq8.gif"]/@width').extract_first()
+		overall_tension_stability = response.xpath('//table[@cellpadding="1"]//tr[3]//td[@class="b"][7]/img[@src="grsq8.gif" or @src="redsq8.gif" or @src="grysq8.gif"]/@width').extract_first()
 		overall_satisfaction = response.xpath('//table[@cellpadding="1"]//tr[3]//td[@class="b2"]//text()').extract_first()
-		overall_rating = response.xpath('//table[@cellpadding="1"]//tr[3]//td[@class="b"][9]/img[@src = "grsq8.gif"]/@width').extract_first()
+		overall_rating = response.xpath('//table[@cellpadding="1"]//tr[3]//td[@class="b"][8]/img[@src = "grsq8.gif" or @src="grsq8x.gif" or @src="redsq8x.gif"]/@width').extract_first()
 		num_ratings = int(response.xpath('//td[@valign="middle"]/text()').re(r'of\s+(.*)')[0])
 		
 		tester_name = response.xpath('//table[@cellpadding="4"]//tr[1]//td[@width="220"]/text()').extract_first()[:-2]
